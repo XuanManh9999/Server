@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <script>
+            let getData = async () => {
+                const url = "http://localhost:6789/api";
+
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    document.body.append(data.data[0])
+                } else {
+                    console.log("Error: " + response.status);
+                }
+            };
+            getData()
+        </script>
+    </body>
+</html>

@@ -1,9 +1,16 @@
-var express = require('express');
-var router = express.Router();
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-module.exports = router;
+import express from "express";
+const router = express.Router();
+function API(router) {
+    router.get("/api", (req, res, next) => {
+        return res.status(200).json({
+          data: [
+            "Xuân Mạnh"
+          ]
+        });
+    });
+    router.get('/', (req, res, next) => {
+      return res.status(200).json('hello world');
+    })
+}
+API(router);
+export default router;
