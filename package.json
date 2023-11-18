@@ -1,0 +1,19 @@
+{
+  "name": "manage_student_eaut",
+  "version": "1.0.0",
+  "description": "Student warning system project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XuanManh9999/Server.git"
+  },
+  "author": "Xuan Manh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/XuanManh9999/Server/issues"
+  },
+  "homepage": "https://github.com/XuanManh9999/Server#readme"
+}
