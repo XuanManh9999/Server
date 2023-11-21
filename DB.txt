@@ -1,0 +1,42 @@
+CREATE TABLE user (
+  ID int AUTO_INCREMENT PRIMARY KEY,
+  UserName nvarchar(30),
+  Password nvarchar(30),
+  FullName nvarchar(50),
+  Email nvarchar(30),
+  Avatar nvarchar(50),
+  Locked bool DEFAULT false,
+  CreatedDate DateTime,
+  UpdatedDate DateTime
+);
+CREATE TABLE Role (
+	ID int AUTO_INCREMENT PRIMARY KEY,
+    Name nvarchar(50),
+    arrange int
+);
+CREATE TABLE UserInRole (
+	ID int AUTO_INCREMENT PRIMARY KEY,
+    UserID int,
+    RoleID int,
+    FOREIGN KEY (UserID) REFERENCES user(ID),
+    FOREIGN KEY (RoleID) REFERENCES role(ID)
+)
+CREATE TABLE Module (
+	ID int AUTO_INCREMENT PRIMARY KEY,
+    Name nvarchar(50),
+    arrange int
+)
+CREATE TABLE Function (
+	ID int AUTO_INCREMENT PRIMARY KEY,
+    Name nvarchar(50),
+    ModuleID int,
+    arrange int,
+    FOREIGN KEY (ModuleID) REFERENCES Module (ID)
+)
+CREATE TABLE FunctionInRole (
+	ID int AUTO_INCREMENT PRIMARY KEY,
+    FunctionID int,
+    RoleID int,
+    FOREIGN KEY (FunctionID) REFERENCES function  (ID),
+    FOREIGN KEY (RoleID) REFERENCES Role (ID)
+)
