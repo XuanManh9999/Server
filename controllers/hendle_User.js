@@ -1,14 +1,14 @@
 import * as servicesUser from "../services/hendleUser.js";
 
-const getAllUser = async (req, res, next) => {
+const getAllUser = async ({ body, query }, res, next) => {
     try {
-        let data = await servicesUser.getAllUser();
+        const data = await servicesUser.getAllUser();
         return res.status(200).json(data);
-    } catch (e) {
-        console.log(e);
-        return res.status(200).json({
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
             errCode: -1,
-            errMessgse: "Error Server",
+            errMessage: "Internal Server Error",
         });
     }
 };

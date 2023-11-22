@@ -5,18 +5,22 @@ const getAllUser = () => {
             connection.query(
                 "SELECT * from user",
                 function (err, results, fields) {
-                    if (results) {
-                        resolve({
-                            errCode: 1,
-                            errMessege: "OK",
-                            data: results,
-                        });
+                    if (err) {
+                       reject(err)
                     } else {
-                        resolve({
-                            errCode: 1,
-                            errMessege: "NO DATA",
-                            data: [],
-                        });
+                        if (results.length > 0) {
+                            resolve({
+                                errCode: 1,
+                                errMessage: "OK",
+                                data: results,
+                            });
+                        } else {
+                            resolve({
+                                errCode: 1,
+                                errMessage: "NO DATA",
+                                data: [],
+                            });
+                        }
                     }
                 }
             );
