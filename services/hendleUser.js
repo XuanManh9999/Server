@@ -1,4 +1,4 @@
-import { connection } from "../config/db.js";
+import { pool as connection } from "../config/db.js";
 const getAllUser = () => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -59,7 +59,5 @@ const getUserById = (id) => {
         }
     });
 };
-const hendle = () => {
-    
-}
+const hendle = () => {};
 export { getAllUser, getUserById };

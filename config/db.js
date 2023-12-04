@@ -1,14 +1,22 @@
 import mysql from "mysql2";
-// create the connection to database
-const connection = mysql.createPool({
+
+// Tạo một đối tượng Pool
+const pool = mysql.createPool({
     host: "localhost",
     user: "root",
     database: "project",
-    connectionLimit: 10, // Số lượng kết nối tối đa
+    connectionLimit: 10,
 });
-if (connection) {
-    console.log("Connect DB Success");
-} else {
-    console.log("Connect DB Error");
-}
-export { connection };
+
+// Kiểm tra kết nối thông qua sự kiện
+pool.getConnection((err, connection) => {
+    if (err) {
+        console.error("Connect DB Error", err);
+    } else {
+        console.log("Connect DB Success");
+        // Đối tượng connection sẵn sàng sử dụng
+        connection.release();
+    }
+});
+
+export { pool };
