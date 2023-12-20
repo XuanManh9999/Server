@@ -10,14 +10,14 @@ const getAllUser = () => {
                     } else {
                         if (results.length > 0) {
                             resolve({
-                                errCode: 1,
-                                errMessage: "OK",
+                                code: 200,
+                                message: "OK",
                                 data: results,
                             });
                         } else {
                             resolve({
-                                errCode: 1,
-                                errMessage: "NO DATA",
+                                code: 404,
+                                message: "DATA NOT FOUND",
                                 data: [],
                             });
                         }
@@ -40,14 +40,14 @@ const getUserById = (id) => {
                     } else {
                         if (results.length > 0) {
                             resolve({
-                                errCode: 1,
-                                errMessage: "OK",
+                                code: 200,
+                                message: "OK",
                                 data: results,
                             });
                         } else {
                             resolve({
-                                errCode: 1,
-                                errMessage: "NO DATA",
+                                code: 404,
+                                message: "DATA NOT FOUND",
                                 data: [],
                             });
                         }
@@ -59,5 +59,4 @@ const getUserById = (id) => {
         }
     });
 };
-const hendle = () => {};
 export { getAllUser, getUserById };
