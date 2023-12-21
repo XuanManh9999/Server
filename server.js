@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import "dotenv/config";
 import cors from "cors";
 
-import main from "./routes/index.js";
+import main from "./src/routes/index.js";
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
