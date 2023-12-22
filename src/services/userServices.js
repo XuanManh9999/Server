@@ -1,62 +1,82 @@
 import { pool as connection } from "../config/db.js";
-const getAllUser = () => {
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+
+// đăng nhập
+const UserLogin = ({ Email, Password }) => {
     return new Promise(async (resolve, reject) => {
         try {
+            // Tìm
             connection.query(
-                "SELECT * from user",
-                function (err, results, fields) {
+                "select * from user where Email = ?",
+                [Email],
+                async (err, results) => {
                     if (err) {
                         reject(err);
-                    } else {
-                        if (results.length > 0) {
+                    } else if (results.length === 0) {
+                        resolve({
+                            status: 404,
+                            message: "Email does not exist in the system",
+                        });
+                    } else if (results.length > 0) {
+                        const IsCheckPassword = bcrypt.compareSync(
+                            Password,
+                            results[0].Password
+                        );
+                        if (IsCheckPassword) {
+                            const token = await jwt.sign(
+                                results[0].ID,
+                                process.env.SECRETKEY
+                            );
                             resolve({
-                                code: 200,
+                                status: 200,
                                 message: "OK",
-                                data: results,
+                                token,
                             });
                         } else {
                             resolve({
-                                code: 404,
-                                message: "DATA NOT FOUND",
-                                data: [],
+                                status: 404,
+                                message:
+                                    "The password does not match the email provided",
                             });
                         }
                     }
                 }
             );
-        } catch (e) {
-            reject(e);
+        } catch (err) {
+            reject(err);
         }
     });
 };
-const getUserById = (id) => {
+
+// Đăng Ký
+const UserRegister = ({ UserName, Password, FullName, Email, Avatar }) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const salt = +process.env.SALT;
+            const hashPassword = bcrypt.hashSync(Password, salt);
             connection.query(
-                `SELECT * from user where id = ${id}`,
-                function (err, results, fields) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        if (results.length > 0) {
-                            resolve({
-                                code: 200,
-                                message: "OK",
-                                data: results,
-                            });
-                        } else {
-                            resolve({
-                                code: 404,
-                                message: "DATA NOT FOUND",
-                                data: [],
-                            });
+                "insert into user (UserName, Password, FullName, Email, Avatar) VALUES (?, ?, ?, ?, ?)",
+                [UserName, hashPassword, FullName, Email, Avatar],
+                (err, results) => {
+                    try {
+                        if (err) {
+                            reject(err);
                         }
+                        resolve({
+                            status: 200,
+                            message: "Account registration successful",
+                            data: results,
+                        });
+                    } catch (err) {
+                        reject(err);
                     }
                 }
             );
-        } catch (e) {
-            reject(e);
+        } catch (err) {
+            reject(err);
         }
     });
 };
-export { getAllUser, getUserById };
+
+export { UserLogin, UserRegister };
