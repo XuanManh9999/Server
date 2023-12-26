@@ -1,7 +1,7 @@
 import { pool as connection } from "../config/db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
+import crypto from "crypto";
 // đăng nhập
 const UserLogin = ({ Email, Password }) => {
     return new Promise(async (resolve, reject) => {
@@ -79,4 +79,46 @@ const UserRegister = ({ UserName, Password, FullName, Email, Avatar }) => {
     });
 };
 
-export { UserLogin, UserRegister };
+// Quên mật khẩu
+// Băm mật khẩu mới
+const generateRandomPassword = (length) => {
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    const password = Array.from(crypto.randomFillSync(new Uint32Array(length)))
+        .map((value) => characters[value % characters.length])
+        .join("");
+    return password;
+};
+
+const ForgotPassword = (Email) => {
+    return new Promise((resolve, reject) => {
+        try {
+            connection.query(
+                "select * from user where email = ?",
+                [Email],
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else if (results.length === 0) {
+                        return resolve({
+                            status: 401,
+                            message: "No account exists in the system",
+                        });
+                    } else if (results.length > 0) {
+                        const newPassword = generateRandomPassword(12);
+                        return resolve({
+                            status: 200,
+                            message: "OK",
+                            newPassword: generateRandomPassword(12),
+                        });
+                    }
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            reject(err);
+        }
+    });
+};
+
+export { UserLogin, UserRegister, ForgotPassword };

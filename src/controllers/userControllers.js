@@ -1,5 +1,6 @@
-import * as userServices from "../services/userServices.js";
+
 import jwt from "jsonwebtoken";
+import * as userServices from "../services/userServices.js";
 import { pool as connection } from "../config/db.js";
 
 //Đăng nhập
@@ -105,4 +106,26 @@ const AuthenticationJVW = (req, res, next) => {
     }
 };
 
-export { UserLogin, UserRegister, AuthenticationJVW };
+const ForgotPassword = async (req, res) => {
+    try {
+        const { Email } = req.body;
+        if (Email) {
+            const responsive = await userServices.ForgotPassword(Email);
+            return res.status(200).json(responsive);
+        } else {
+            return res.status(404).json({
+                status: 404,
+                message:
+                    "The user has not entered enough information to continue",
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            status: 500,
+            message: "An error occurred on the server",
+        });
+    }
+};
+
+export { UserLogin, UserRegister, AuthenticationJVW, ForgotPassword };
