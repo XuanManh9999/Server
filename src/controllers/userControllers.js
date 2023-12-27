@@ -1,7 +1,4 @@
-
-import jwt from "jsonwebtoken";
 import * as userServices from "../services/userServices.js";
-import { pool as connection } from "../config/db.js";
 
 //Đăng nhập
 const UserLogin = async (req, res) => {
@@ -32,7 +29,7 @@ const UserLogin = async (req, res) => {
 const UserRegister = async (req, res) => {
     try {
         const { UserName, Password, FullName, Email, Avatar } = req.body;
-        if (UserName && Password && FullName && Email && Avatar) {
+        if (UserName && Password && FullName && Email) {
             const responsive = await userServices.UserRegister({
                 UserName,
                 Password,
@@ -47,56 +44,6 @@ const UserRegister = async (req, res) => {
                 message: "Please enter complete information to continue",
             });
         }
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({
-            status: 500,
-            message: "An error occurred on the server",
-        });
-    }
-};
-
-// Sử dụng có các route cần xác thực
-
-const AuthenticationJVW = (req, res, next) => {
-    try {
-        /// req.header()
-        const token = req.body.token;
-        if (!token) {
-            return res.status(401).json({
-                status: 401,
-                message: "Did not receive token from header",
-            });
-        }
-        jwt.verify(token, process.env.SECRETKEY, (err, userId) => {
-            if (err) {
-                return res.status(401).json({
-                    status: 403,
-                    message: "An error occurred while validating the token",
-                });
-            }
-            connection.query(
-                "select * from user where id = ?",
-                [userId],
-                (err, result) => {
-                    if (err) {
-                        return res.status(401).json({
-                            status: 500,
-                            message: "An error from server",
-                        });
-                    }
-                    if (result.length === 0) {
-                        return res.status(401).json({
-                            status: 401,
-                            message: "User not found",
-                        });
-                    } else if (result.length > 0) {
-                        req.user = result;
-                        next();
-                    }
-                }
-            );
-        });
     } catch (err) {
         console.log(err);
         return res.status(500).json({
@@ -128,4 +75,17 @@ const ForgotPassword = async (req, res) => {
     }
 };
 
-export { UserLogin, UserRegister, AuthenticationJVW, ForgotPassword };
+const UserData = async (req, res) => {
+    try {
+        const responsive = await userServices.UserData();
+        return res.status(200).json(responsive);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            status: 500,
+            message: "An error occurred on the server",
+        });
+    }
+};
+
+export { UserLogin, UserRegister, ForgotPassword, UserData };

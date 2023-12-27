@@ -2,6 +2,21 @@ import { pool as connection } from "../config/db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+
+const generateAcessToken = (data) => {
+    const access_token = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1m",
+    });
+    return access_token;
+};
+
+const generateRefreshToken = (data) => {
+    const refresh_token = jwt.sign(data, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "365d",
+    });
+    return refresh_token;
+};
+
 // đăng nhập
 const UserLogin = ({ Email, Password }) => {
     return new Promise(async (resolve, reject) => {
@@ -24,15 +39,45 @@ const UserLogin = ({ Email, Password }) => {
                             results[0].Password
                         );
                         if (IsCheckPassword) {
-                            const token = await jwt.sign(
-                                results[0].ID,
-                                process.env.SECRETKEY
+                            const _idUser = results[0].ID;
+                            connection.query(
+                                "select user.id, name  from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on userinrole.RoleID = role.ID and user.ID = ?",
+                                [_idUser],
+                                (err, roleUser) => {
+                                    if (err) {
+                                        reject(err);
+                                    }
+                                    if (roleUser.length === 0) {
+                                        resolve({
+                                            status: 500,
+                                            message:
+                                                "There is an error on the server side. The error is in the database, which cannot find administrator permissions to authenticate",
+                                        });
+                                    } else if (roleUser.length > 0) {
+                                        const access_token = generateAcessToken(
+                                            {
+                                                id: roleUser[0].id,
+                                                role: roleUser[0].name,
+                                            }
+                                        );
+                                        const refresh_token =
+                                            generateRefreshToken({
+                                                id: roleUser[0].id,
+                                                role: roleUser[0].name,
+                                            });
+                                        resolve({
+                                            status: 200,
+                                            message: "OK",
+                                            UserName: results[0].UserName,
+                                            FullName: results[0].FullName,
+                                            Email: results[0].Email,
+                                            Avatar: results[0].Avatar,
+                                            access_token,
+                                            refresh_token,
+                                        });
+                                    }
+                                }
                             );
-                            resolve({
-                                status: 200,
-                                message: "OK",
-                                token,
-                            });
                         } else {
                             resolve({
                                 status: 404,
@@ -105,7 +150,6 @@ const ForgotPassword = (Email) => {
                             message: "No account exists in the system",
                         });
                     } else if (results.length > 0) {
-                        const newPassword = generateRandomPassword(12);
                         return resolve({
                             status: 200,
                             message: "OK",
@@ -121,4 +165,32 @@ const ForgotPassword = (Email) => {
     });
 };
 
-export { UserLogin, UserRegister, ForgotPassword };
+const UserData = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            connection.query("select * from user", (err, results) => {
+                if (err) {
+                    reject(err);
+                }
+                if (results.length === 0) {
+                    resolve({
+                        status: 401,
+                        message: "Data is empty",
+                        data: results,
+                    });
+                } else if (results.length > 0) {
+                    resolve({
+                        status: 200,
+                        message: "OK",
+                        data: results,
+                    });
+                }
+            });
+        } catch (err) {
+            console.log(err);
+            reject(err);
+        }
+    });
+};
+
+export { UserLogin, UserRegister, ForgotPassword, UserData };
