@@ -134,11 +134,20 @@ const UserRegister = ({ UserName, Password, FullName, Email, Avatar }) => {
                         if (err) {
                             reject(err);
                         }
-                        resolve({
-                            status: 200,
-                            message: "Account registration successful",
-                            data: results,
-                        });
+                        connection.query(
+                            "insert into userinrole (UserID, RoleID) values (?, ?)",
+                            [+results.insertId, 3],
+                            (err, result) => {
+                                if (err) {
+                                    reject(err);
+                                }
+                                resolve({
+                                    status: 200,
+                                    message: "Account registration successful",
+                                    data: result,
+                                });
+                            }
+                        );
                     } catch (err) {
                         reject(err);
                     }
