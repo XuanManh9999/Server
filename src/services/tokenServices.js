@@ -7,13 +7,6 @@ const generateAcessToken = (data) => {
     return access_token;
 };
 
-const generateRefreshToken = (data) => {
-    const refresh_token = jwt.sign(data, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "365d",
-    });
-    return refresh_token;
-};
-
 const UserRefreshToken = (refreshToken) => {
     return new Promise((resolve, reject) => {
         try {

@@ -8,6 +8,7 @@ const UserLogin = async (req, res) => {
             const responsive = await userServices.UserLogin({
                 Email,
                 Password,
+                res,
             });
             return res.status(200).json(responsive);
         } else {

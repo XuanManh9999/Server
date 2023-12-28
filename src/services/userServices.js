@@ -2,7 +2,6 @@ import { pool as connection } from "../config/db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-
 const generateAcessToken = (data) => {
     const access_token = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1m",
@@ -18,7 +17,7 @@ const generateRefreshToken = (data) => {
 };
 
 // đăng nhập
-const UserLogin = ({ Email, Password }) => {
+const UserLogin = ({ Email, Password, res }) => {
     return new Promise(async (resolve, reject) => {
         try {
             // Tìm
@@ -65,6 +64,19 @@ const UserLogin = ({ Email, Password }) => {
                                                 id: roleUser[0].id,
                                                 role: roleUser[0].name,
                                             });
+                                        // Lưu Refresh Token vào cookie
+                                        res.cookie(
+                                            "refreshToken",
+                                            refresh_token,
+                                            {
+                                                httpOnly: false,
+                                                maxAge:
+                                                    60 * 60 * 24 * 365 * 1000, // 365 ngày, đơn vị là miligiây
+                                                path: "/",
+                                                sameSite: "strict",
+                                            }
+                                        );
+
                                         resolve({
                                             status: 200,
                                             message: "OK",
@@ -73,7 +85,6 @@ const UserLogin = ({ Email, Password }) => {
                                             Email: results[0].Email,
                                             Avatar: results[0].Avatar,
                                             access_token,
-                                            refresh_token,
                                         });
                                     }
                                 }
