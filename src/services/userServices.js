@@ -64,6 +64,21 @@ const UserLogin = ({ Email, Password, res }) => {
                                                 id: roleUser[0].id,
                                                 role: roleUser[0].name,
                                             });
+                                        // Cập nhật Refresh lưu vào DB
+                                        connection.query(
+                                            "update user set RefreshToken = ? where ID = ?",
+                                            [refresh_token, roleUser[0].id],
+                                            (err) => {
+                                                if (err) {
+                                                    resolve({
+                                                        status: 500,
+                                                        message:
+                                                            "An error occurred while saving refresh_token to the db",
+                                                    });
+                                                }
+                                            }
+                                        );
+
                                         // Lưu Refresh Token vào cookie
                                         res.cookie(
                                             "refreshToken",
@@ -179,24 +194,27 @@ const ForgotPassword = (Email) => {
 const UserData = () => {
     return new Promise((resolve, reject) => {
         try {
-            connection.query("select * from user", (err, results) => {
-                if (err) {
-                    reject(err);
+            connection.query(
+                "select ID, UserName, FullName, Email, Avatar from user",
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (results.length === 0) {
+                        resolve({
+                            status: 401,
+                            message: "Data is empty",
+                            data: results,
+                        });
+                    } else if (results.length > 0) {
+                        resolve({
+                            status: 200,
+                            message: "OK",
+                            data: results,
+                        });
+                    }
                 }
-                if (results.length === 0) {
-                    resolve({
-                        status: 401,
-                        message: "Data is empty",
-                        data: results,
-                    });
-                } else if (results.length > 0) {
-                    resolve({
-                        status: 200,
-                        message: "OK",
-                        data: results,
-                    });
-                }
-            });
+            );
         } catch (err) {
             console.log(err);
             reject(err);
@@ -204,4 +222,35 @@ const UserData = () => {
     });
 };
 
-export { UserLogin, UserRegister, ForgotPassword, UserData };
+const UserById = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            connection.query(
+                "select ID, UserName, FullName, Email, Avatar from user where ID = ?",
+                [id],
+                (err, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (result.length === 0) {
+                        resolve({
+                            status: 401,
+                            message: "The user does not exist in the system",
+                        });
+                    } else if (result.length > 0) {
+                        resolve({
+                            status: 400,
+                            message: "OK",
+                            data: result,
+                        });
+                    }
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            reject(err);
+        }
+    });
+};
+
+export { UserLogin, UserRegister, ForgotPassword, UserData, UserById };

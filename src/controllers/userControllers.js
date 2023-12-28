@@ -1,3 +1,4 @@
+import e from "express";
 import * as userServices from "../services/userServices.js";
 
 //Đăng nhập
@@ -89,4 +90,25 @@ const UserData = async (req, res) => {
     }
 };
 
-export { UserLogin, UserRegister, ForgotPassword, UserData };
+const UserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (id) {
+            const responsive = await userServices.UserById(id);
+            return res.status(200).json(responsive);
+        } else {
+            return res.status(400).json({
+                status: 400,
+                message: "Please enter complete information to continue",
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            status: 500,
+            message: "An error occurred on the server",
+        });
+    }
+};
+
+export { UserLogin, UserRegister, ForgotPassword, UserData, UserById };

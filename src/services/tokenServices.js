@@ -21,14 +21,29 @@ const UserRefreshToken = (refreshToken) => {
                         });
                     }
                     if (user) {
-                        const newAcessToken = generateAcessToken({
-                            id: user.id,
-                            role: user.role,
-                        });
-                        resolve({
-                            status: "OK",
-                            access_token: newAcessToken,
-                        });
+                        try {
+                            const newAcessToken = generateAcessToken({
+                                id: user.id,
+                                role: user.role,
+                            });
+                            if (newAcessToken) {
+                                resolve({
+                                    status: 200,
+                                    message: "Created new token successfully",
+                                    access_token: newAcessToken,
+                                });
+                            } else {
+                                resolve({
+                                    status: 404,
+                                    message: "Creating new token failed",
+                                });
+                            }
+                        } catch (err) {
+                            resolve({
+                                status: 404,
+                                message: "The user is not authentication",
+                            });
+                        }
                     } else {
                         resolve({
                             status: 404,
@@ -38,8 +53,10 @@ const UserRefreshToken = (refreshToken) => {
                 }
             );
         } catch (err) {
-            console.log(err);
-            reject(err);
+            resolve({
+                status: 404,
+                message: "refreshToken has expired, please log in again",
+            });
         }
     });
 };
