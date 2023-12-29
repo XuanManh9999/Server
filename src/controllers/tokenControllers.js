@@ -5,10 +5,8 @@ const UserRefreshToken = async (req, res) => {
         const { token } = req.headers;
         const refreshToken = token;
         if (refreshToken) {
-            const responsive = await tokenServices.UserRefreshToken(
-                refreshToken
-            );
-            return res.status(200).json(responsive);
+            const response = await tokenServices.UserRefreshToken(refreshToken);
+            return res.status(200).json(response);
         } else {
             return res.status(500).json({
                 status: 500,

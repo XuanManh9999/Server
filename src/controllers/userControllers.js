@@ -6,12 +6,12 @@ const UserLogin = async (req, res) => {
     try {
         const { Email, Password } = req.body;
         if (Email && Password) {
-            const responsive = await userServices.UserLogin({
+            const response = await userServices.UserLogin({
                 Email,
                 Password,
                 res,
             });
-            return res.status(200).json(responsive);
+            return res.status(200).json(response);
         } else {
             return res.status(400).json({
                 status: 400,
@@ -32,14 +32,14 @@ const UserRegister = async (req, res) => {
     try {
         const { UserName, Password, FullName, Email, Avatar } = req.body;
         if (UserName && Password && FullName && Email) {
-            const responsive = await userServices.UserRegister({
+            const response = await userServices.UserRegister({
                 UserName,
                 Password,
                 FullName,
                 Email,
                 Avatar,
             });
-            return res.status(200).json(responsive);
+            return res.status(200).json(response);
         } else {
             return res.status(400).json({
                 status: 400,
@@ -59,8 +59,8 @@ const ForgotPassword = async (req, res) => {
     try {
         const { Email } = req.body;
         if (Email) {
-            const responsive = await userServices.ForgotPassword(Email);
-            return res.status(200).json(responsive);
+            const response = await userServices.ForgotPassword(Email);
+            return res.status(200).json(response);
         } else {
             return res.status(404).json({
                 status: 404,
@@ -79,8 +79,8 @@ const ForgotPassword = async (req, res) => {
 
 const UserData = async (req, res) => {
     try {
-        const responsive = await userServices.UserData();
-        return res.status(200).json(responsive);
+        const response = await userServices.UserData();
+        return res.status(200).json(response);
     } catch (err) {
         console.log(err);
         return res.status(500).json({
@@ -94,8 +94,8 @@ const UserById = async (req, res) => {
     try {
         const { id } = req.params;
         if (id) {
-            const responsive = await userServices.UserById(id);
-            return res.status(200).json(responsive);
+            const response = await userServices.UserById(id);
+            return res.status(200).json(response);
         } else {
             return res.status(400).json({
                 status: 400,
