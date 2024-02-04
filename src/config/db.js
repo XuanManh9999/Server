@@ -1,22 +1,21 @@
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 
 // Tạo một đối tượng Pool
 const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    database: "project",
-    connectionLimit: 10,
+  host: "localhost",
+  user: "root",
+  database: "project",
+  connectionLimit: 10,
 });
 
-// Kiểm tra kết nối thông qua sự kiện
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error("Connect DB Error", err);
-    } else {
-        console.log("Connect DB Success");
-        // Đối tượng connection sẵn sàng sử dụng
-        connection.release();
-    }
-});
+// Kiểm tra kết nối thông qua promise
+pool
+  .getConnection()
+  .then(() => {
+    console.log("Connect DB Success");
+  })
+  .catch((err) => {
+    console.error("Connect DB Error", err);
+  });
 
 export { pool };
