@@ -53,6 +53,7 @@ const authMiddlewareLecturers = (req, res, next) => {
         }
     });
 };
+
 // Người dùng JWT
 const authMiddlewareStudent = (req, res, next) => {
     const { token } = req.headers;
@@ -62,6 +63,7 @@ const authMiddlewareStudent = (req, res, next) => {
             message: "Token is valid",
         });
     }
+
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             return res.status(404).json({

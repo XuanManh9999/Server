@@ -1,42 +1,233 @@
-CREATE TABLE user (
-  ID int AUTO_INCREMENT PRIMARY KEY,
-  UserName nvarchar(30),
-  Password nvarchar(30),
-  FullName nvarchar(50),
-  Email nvarchar(30),
-  Avatar nvarchar(50),
-  Locked bool DEFAULT false,
-  CreatedDate DateTime,
-  UpdatedDate DateTime
+CREATE TABLE User (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Msv VARCHAR(255),
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    FullName VARCHAR(255),
+    UserName VARCHAR(255),
+    Password VARCHAR(255),
+    Email VARCHAR(255),
+    Avatar VARCHAR(255),
+    RefreshToken VARCHAR(255),
+    Locked BOOLEAN,
+    IDClass INT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE User_Phone (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUser INT,
+    Phone VARCHAR(255),
+    FOREIGN KEY (IDUser) REFERENCES User(ID)
+);
+
+CREATE TABLE User_Activity (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUser INT,
+    IDActive INT,
+    FOREIGN KEY (IDUser) REFERENCES User(ID)
+);
+
+CREATE TABLE User_Warning (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUser INT,
+    IDWarning INT,
+    FOREIGN KEY (IDUser) REFERENCES User(ID)
+);
+
+CREATE TABLE User_Course (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUser INT,
+    IDCourse INT,
+    FOREIGN KEY (IDUser) REFERENCES User(ID)
+);
+
+CREATE TABLE User_StudyProgram (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUser INT,
+    IDStudyProgram INT,
+    FOREIGN KEY (IDUser) REFERENCES User(ID)
+);
+
+CREATE TABLE User_Faculty (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUser INT,
+    IDFaculty INT,
+    FOREIGN KEY (IDUser) REFERENCES User(ID)
+);
+
 CREATE TABLE Role (
-	ID int AUTO_INCREMENT PRIMARY KEY,
-    Name nvarchar(50),
-    arrange int
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255),
+    Order INT
 );
+
 CREATE TABLE UserInRole (
-	ID int AUTO_INCREMENT PRIMARY KEY,
-    UserID int,
-    RoleID int,
-    FOREIGN KEY (UserID) REFERENCES user(ID),
-    FOREIGN KEY (RoleID) REFERENCES role(ID)
-)
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT,
+    RoleID INT,
+    FOREIGN KEY (UserID) REFERENCES User(ID),
+    FOREIGN KEY (RoleID) REFERENCES Role(ID)
+);
+
+
 CREATE TABLE Module (
-	ID int AUTO_INCREMENT PRIMARY KEY,
-    Name nvarchar(50),
-    arrange int
-)
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255),
+    Order INT
+);
+
 CREATE TABLE Function (
-	ID int AUTO_INCREMENT PRIMARY KEY,
-    Name nvarchar(50),
-    ModuleID int,
-    arrange int,
-    FOREIGN KEY (ModuleID) REFERENCES Module (ID)
-)
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255),
+    ModuleID INT,
+    `Order ` INT,
+    FOREIGN KEY (ModuleID) REFERENCES Module(ID)
+);
+
 CREATE TABLE FunctionInRole (
-	ID int AUTO_INCREMENT PRIMARY KEY,
-    FunctionID int,
-    RoleID int,
-    FOREIGN KEY (FunctionID) REFERENCES function  (ID),
-    FOREIGN KEY (RoleID) REFERENCES Role (ID)
-)
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    FunctionID INT,
+    RoleID INT,
+    FOREIGN KEY (FunctionID) REFERENCES Function(ID),
+    FOREIGN KEY (RoleID) REFERENCES Role(ID)
+);
+CREATE TABLE Course (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NameCourse VARCHAR(255),
+    NumberOfCredits INT,
+    Describe TEXT,
+    Schedule TEXT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE StudyProgram (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ProgramName VARCHAR(255),
+    CreditNumber INT,
+    CompletionTime INT,
+    Describe TEXT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Course_StudyProgram (
+    IDCourse INT,
+    IDStudyProgram INT,
+    PRIMARY KEY (IDCourse, IDStudyProgram),
+    FOREIGN KEY (IDCourse) REFERENCES Course(ID),
+    FOREIGN KEY (IDStudyProgram) REFERENCES StudyProgram(ID)
+);
+
+
+CREATE TABLE Faculty (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    FacultyName VARCHAR(255),
+    Founding DATE,
+    Describe TEXT,
+    Email VARCHAR(255),
+    PhoneNumber VARCHAR(255),
+    IDFaculty INT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Point (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Frequent VARCHAR(255),
+    MidtermScore FLOAT,
+    FinalExamScore FLOAT,
+    AverageScore FLOAT,
+    Scores FLOAT,
+    LetterGrades VARCHAR(255),
+    ScoreScale10 FLOAT,
+    ScoreScale4 FLOAT,
+    ExcludingTBC BOOLEAN,
+    Note TEXT,
+    IDUser INT,
+    IDCourse INT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (IDUser) REFERENCES User(ID),
+    FOREIGN KEY (IDCourse) REFERENCES Course(ID)
+);
+
+CREATE TABLE Attendance (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    AttendanceStatus VARCHAR(255),
+    Semester VARCHAR(255),
+    SchoolYear VARCHAR(255),
+    Comment TEXT,
+    IDStudent INT,
+    IDTeacher INT,
+    IDCourse INT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (IDStudent) REFERENCES User(ID),
+    FOREIGN KEY (IDTeacher) REFERENCES User(ID),
+    FOREIGN KEY (IDCourse) REFERENCES Course(ID)
+);
+
+CREATE TABLE DocumentLibrary (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NameDOC VARCHAR(255),
+    Status VARCHAR(255),
+    Source VARCHAR(255),
+    Url VARCHAR(255),
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE Course_DocumentLibrary (
+    IDCourse INT,
+    IDDocumentLibrary INT,
+    PRIMARY KEY (IDCourse, IDDocumentLibrary),
+    FOREIGN KEY (IDCourse) REFERENCES Course(ID),
+    FOREIGN KEY (IDDocumentLibrary) REFERENCES DocumentLibrary(ID)
+);
+
+CREATE TABLE Warning (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255),
+    WarningDate DATE,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE WarningLevel (
+    IDWarning INT,
+    Level VARCHAR(255),
+    PRIMARY KEY (IDWarning),
+    FOREIGN KEY (IDWarning) REFERENCES Warning(ID)
+);
+
+CREATE TABLE Activity (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ActivityName VARCHAR(255),
+    Location VARCHAR(255),
+    Time DATETIME,
+    Describe TEXT,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Reward (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    RewardName VARCHAR(255),
+    ReceivedDate DATE,
+    Achievements TEXT,
+    `Describe` TEXT,
+    Contact VARCHAR(255),
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Class (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NameClass VARCHAR(255),
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
