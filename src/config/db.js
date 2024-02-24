@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
-  database: "project",
+  database: "database",
   connectionLimit: 10,
 });
 
@@ -19,3 +19,5 @@ pool
   });
 
 export { pool };
+{
+}
