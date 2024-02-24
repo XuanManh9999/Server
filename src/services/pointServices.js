@@ -19,7 +19,6 @@ const importPoint = ({
     let idCourse;
     try {
       connect = await connection.getConnection();
-      console.log("có vào đây");
       if (!connect) {
         throw new Error("Connection is undefined or null.");
       }
