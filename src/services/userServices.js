@@ -96,40 +96,6 @@ const UserLogin = ({ Email, Password, res }) => {
   });
 };
 
-// const UserRegister = async ({
-//   UserName,
-//   Password,
-//   FullName,
-//   Email,
-//   Avatar,
-// }) => {
-//   try {
-//     const salt = +process.env.SALT;
-//     const hashPassword = bcrypt.hashSync(Password, salt);
-
-//     // Thực hiện truy vấn đầu tiên
-//     const [userInsertResult] = await connection.execute(
-//       "INSERT INTO user (UserName, Password, FullName, Email, Avatar) VALUES (?, ?, ?, ?, ?)",
-//       [UserName, hashPassword, FullName, Email, Avatar]
-//     );
-
-//     // Thực hiện truy vấn thứ hai
-//     const [userInRoleResult] = await connection.execute(
-//       "INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)",
-//       [userInsertResult.insertId, 3]
-//     );
-
-//     // Trả về kết quả
-//     return {
-//       status: 200,
-//       message: "Đăng ký tài khoản thành công",
-//       data: userInRoleResult,
-//     };
-//   } catch (err) {
-//     // Nếu có lỗi, reject để bắt được ở nơi gọi hàm
-//     throw err;
-//   }
-// };
 
 // Quên mật khẩu
 // Băm mật khẩu mới
