@@ -9,8 +9,14 @@ import {
 router.post("/register", userControllers.UserRegister);
 router.post("/login", userControllers.UserLogin);
 router.post("/forgot-password", userControllers.ForgotPassword);
+
+// lấy toàn bộ
 router.get("/users", userControllers.UserData);
+
+// Lấy theo ID
 router.get("/:id", userControllers.UserById);
+
+
 router.post("/test", userControllers.hendleTest);
 
 

@@ -23,38 +23,7 @@ const importPoint = ({
         throw new Error("Connection is undefined or null.");
       }
       await connect.beginTransaction();
-      // check class
-      const [dataClass] = await connect.execute(
-        "select ID from class where NameClass = ?",
-        [Class]
-      );
-      idClass = dataClass.length > 0 ? dataClass[0].ID : null; // Update index here
-      if (!idClass) {
-        // creat Class
-        const [result] = await connect.execute(
-          "insert into class (NameClass) values (?)",
-          [Class]
-        );
-        idClass = result.insertId;
-      }
-      // check user
-      const [dataUsers] = await connect.execute(
-        "select DISTINCT user.ID from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on userinrole.RoleID = role.ID and role.ID = 2 and user.FullName = ?",
-        [Teacher]
-      );
-      idTeacher = dataUsers.length > 0 ? dataUsers[0].ID : null; // Update index here
-      if (!idTeacher) {
-        const [result] = await connect.execute(
-          "INSERT INTO user (FullName, IDClass)  VALUES (?, ?)",
-          [Teacher, idClass]
-        );
-        idTeacher = result.insertId;
-        console.log("Xuan manh check idTeacher", idTeacher);
-        await connect.execute(
-          "INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)",
-          [idTeacher, 2] // Wrap IDs in an array
-        );
-      }
+
       // check khoa
       const [dataFaculty] = await connect.execute(
         "select DISTINCT  id from faculty where FacultyName = ?",
@@ -69,6 +38,39 @@ const importPoint = ({
         );
         idFaculty = result.insertId;
       }
+      // check class
+      const [dataClass] = await connect.execute(
+        "select ID from class where NameClass = ?",
+        [Class]
+      );
+      idClass = dataClass.length > 0 ? dataClass[0].ID : null; // Update index here
+      if (!idClass) {
+        // creat Class
+        const [result] = await connect.execute(
+          "insert into class (NameClass, IDFaculty) values (?, ?)",
+          [Class, idFaculty]
+        );
+        idClass = result.insertId;
+      }
+
+      // check user
+      const [dataUsers] = await connect.execute(
+        "select DISTINCT user.ID from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on userinrole.RoleID = role.ID and role.ID = 2 and user.FullName = ?",
+        [Teacher]
+      );
+      idTeacher = dataUsers.length > 0 ? dataUsers[0].ID : null; // Update index here
+      if (!idTeacher) {
+        const [result] = await connect.execute(
+          "INSERT INTO user (FullName, IDClass)  VALUES (?, ?)",
+          [Teacher, idClass]
+        );
+        idTeacher = result.insertId;
+        await connect.execute(
+          "INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)",
+          [idTeacher, 2] // Wrap IDs in an array
+        );
+      }
+
       // check course
       const [dataCourse] = await connect.execute(
         "select DISTINCT id from course where NameCourse = ?",
@@ -87,6 +89,20 @@ const importPoint = ({
           [idTeacher, idCourse]
         );
       }
+
+      // check class_course
+      const [dataCourseClass] = await connect.execute(
+        "SELECT * from class_course where class_course.IDCourse = ? and class_course.IDClass = ?",
+        [idCourse, idClass]
+      );
+      // create course_class
+      if (!(dataCourseClass?.length > 0)) {
+        await execute("insert into class_course values (?, ?)", [
+          idCourse,
+          idClass,
+        ]);
+      }
+
       if (DataStudents?.length > 0 && DataPoint.length > 0) {
         for (let i = 0; i < DataStudents.length; i++) {
           let [result] = await connect.execute(
@@ -123,6 +139,7 @@ const importPoint = ({
         }
       }
       await connect.commit();
+
       resolve({
         status: 200,
         message: "Import dữ liệu thành công",
@@ -135,4 +152,55 @@ const importPoint = ({
     }
   });
 
-export { importPoint };
+const selectSeculty = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "select ID, FacultyName from faculty"
+      );
+      if (result?.length > 0) {
+        resolve({
+          status: 200,
+          message: "Get data faculty done",
+          data: result,
+        });
+      } else {
+        resolve({
+          status: 403,
+          message: "Data faculty is empty",
+          data: [],
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+const selectClassByID = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT ID, NameClass from class where IDFaculty = ?",
+        [id]
+      );
+      if (result?.length > 0) {
+        resolve({
+          status: 200,
+          message: "Get data class done",
+          data: result,
+        });
+      } else {
+        resolve({
+          status: 403,
+          message: "Data class is empty",
+          data: [],
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export { importPoint, selectSeculty, selectClassByID };

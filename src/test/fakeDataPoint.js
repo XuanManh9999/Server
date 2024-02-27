@@ -21,14 +21,3 @@ const fake = {
     },
   ],
 };
-// Chia nhỏ
-/**
- * Đầu tiên lưu giảng viên, Lưu môn học
- * Thêm  User_Course ();
- * Sau đó tiến hành thêm Sinh Viên
- * Rồi Lưu điểm
- * Course (nameCourse, NumberOfCredits, TotalHours, FinalExamDate)
- * User (Msv, FullName, Gender, Role)
- *
- *
- */
