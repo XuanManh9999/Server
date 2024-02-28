@@ -43,6 +43,7 @@ const importPoint = ({
         "select ID from class where NameClass = ?",
         [Class]
       );
+
       idClass = dataClass.length > 0 ? dataClass[0].ID : null; // Update index here
       if (!idClass) {
         // creat Class
@@ -95,7 +96,7 @@ const importPoint = ({
         "SELECT * from class_course where class_course.IDCourse = ? and class_course.IDClass = ?",
         [idCourse, idClass]
       );
-      // create course_class
+      // create class_course
       if (!(dataCourseClass?.length > 0)) {
         await execute("insert into class_course values (?, ?)", [
           idCourse,
@@ -118,10 +119,12 @@ const importPoint = ({
             "INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)",
             [result.insertId, 3] // Wrap IDs in an array
           );
+
           await connect.execute(
             "insert into user_course (IDUser, IDCourse) values (?, ?)",
             [result.insertId, idCourse]
           );
+
           await connect.execute(
             "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
@@ -203,4 +206,30 @@ const selectClassByID = (id) => {
   });
 };
 
-export { importPoint, selectSeculty, selectClassByID };
+const selectCourseByIdClass = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT DISTINCT course.id, course.NameCourse from class INNER JOIN  class_course on class_course.IDClass = ? INNER JOIN course on course.ID = class_course.IDCourse",
+        [id]
+      );
+      if (result?.length > 0) {
+        resolve({
+          status: 200,
+          message: "Get Data Courses By Id Class Done",
+          data: result,
+        });
+      } else {
+        resolve({
+          status: 200,
+          message: "Get Data Courses By Id Class Is Empty",
+          data: [],
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export { importPoint, selectSeculty, selectClassByID, selectCourseByIdClass };

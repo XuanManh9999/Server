@@ -8,4 +8,7 @@ router.get("/select-class-by-id/:id", hendlePoint.selectClassByID);
 
 router.post("/import-point", hendlePoint.importPoint);
 
+
+router.get("/select-courses-by-id-class/:id", hendlePoint.selectCourseByIdClass)
+
 export default router;

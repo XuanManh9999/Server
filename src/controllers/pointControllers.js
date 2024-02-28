@@ -71,9 +71,30 @@ const selectClassByID = async (req, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An Err from Server",
+      message: "An Err from selectClassByID ",
     });
   }
 };
 
-export { importPoint, selectSeculty, selectClassByID };
+const selectCourseByIdClass = async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (id) {
+      const response = await hendlePoint.selectCourseByIdClass(id);
+      return res.status(200).json(response);
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: "ID Is undefine or null. Check please",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      status: 500,
+      message: "An Error from selectCourseByIdClass",
+    });
+  }
+};
+
+export { importPoint, selectSeculty, selectClassByID, selectCourseByIdClass };
