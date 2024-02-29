@@ -97,7 +97,7 @@ const importPoint = ({
         [idCourse, idClass]
       );
       // create class_course
-      if (!(dataCourseClass?.length > 0)) {
+      if (!dataCourseClass.length > 0) {
         await connect.execute("insert into class_course values (?, ?)", [
           idCourse,
           idClass,
