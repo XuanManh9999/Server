@@ -121,6 +121,10 @@ const importPoint = ({
             ]
           );
           await connect.execute(
+            "INSERT INTO user_faculty (IDUser, IDFaculty) values (?, ?)",
+            [result.insertId, idFaculty]
+          );
+          await connect.execute(
             "INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)",
             [result.insertId, 3] // Wrap IDs in an array
           );
