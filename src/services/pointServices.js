@@ -98,13 +98,18 @@ const importPoint = ({
       );
       // create class_course
       if (!(dataCourseClass?.length > 0)) {
-        await execute("insert into class_course values (?, ?)", [
+        await connect.execute("insert into class_course values (?, ?)", [
           idCourse,
           idClass,
         ]);
       }
 
-      if (DataStudents?.length > 0 && DataPoint.length > 0) {
+      if (
+        DataStudents?.length > 0 &&
+        DataPoint.length > 0 &&
+        idCourse &&
+        idClass
+      ) {
         for (let i = 0; i < DataStudents.length; i++) {
           let [result] = await connect.execute(
             "insert into user (Msv, FullName, Gender, IDClass) values (?, ?, ?, ?)",

@@ -8,7 +8,7 @@ const generateAcessToken = (data) => {
 };
 
 const UserRefreshToken = (refreshToken) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _) => {
     try {
       jwt.verify(
         refreshToken,
