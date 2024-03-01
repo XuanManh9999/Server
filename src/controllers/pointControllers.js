@@ -97,4 +97,35 @@ const selectCourseByIdClass = async (req, res) => {
   }
 };
 
-export { importPoint, selectSeculty, selectClassByID, selectCourseByIdClass };
+const selectPointClass = async (req, res) => {
+  try {
+    const { IdFaculty, idClass, idCourse } = req.query;
+    if (IdFaculty && idClass && idCourse) {
+      const response = await hendlePoint.selectPointClass({
+        IdFaculty,
+        idClass,
+        idCourse,
+      });
+      return res.status(200).json(response);
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: "Please transmit enough data to be able to retrieve the data",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      status: 500,
+      message: "An Error from selectPointClass",
+    });
+  }
+};
+
+export {
+  importPoint,
+  selectSeculty,
+  selectClassByID,
+  selectCourseByIdClass,
+  selectPointClass,
+};

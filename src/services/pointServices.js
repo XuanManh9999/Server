@@ -241,4 +241,36 @@ const selectCourseByIdClass = (id) => {
   });
 };
 
-export { importPoint, selectSeculty, selectClassByID, selectCourseByIdClass };
+const selectPointClass = ({ IdFaculty, idClass, idCourse }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT user.Msv, user.FullName, user.Gender, point.Frequent, point.MidtermScore, point.FinalExamScore, point.AverageScore, point.Scores, point.LetterGrades, point.Note from user INNER JOIN userinrole on userinrole.UserID = user.ID and user.IDClass = ?  INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_faculty on user_faculty.IDUser = user.ID INNER JOIN faculty on faculty.ID = ? INNER JOIN user_course on user.ID = user_course.IDUser INNER JOIN course on course.ID = user_course.IDCourse INNER JOIN point on point.IDUser = user.ID and point.IDCourse = ?",
+        [idClass, IdFaculty, idCourse]
+      );
+      if (result && result.length > 0) {
+        resolve({
+          status: 200,
+          message: "Get Data Point Student Done",
+          data: result,
+        });
+      } else {
+        resolve({
+          status: 200,
+          message: "Get Data Point Student Done Is Data Empty",
+          data: [],
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export {
+  importPoint,
+  selectSeculty,
+  selectClassByID,
+  selectCourseByIdClass,
+  selectPointClass,
+};
