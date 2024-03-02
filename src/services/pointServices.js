@@ -26,7 +26,7 @@ const importPoint = ({
 
       // check khoa
       const [dataFaculty] = await connect.execute(
-        "select DISTINCT  id from faculty where FacultyName = ?",
+        "select DISTINCT  ID from faculty where FacultyName = ?",
         [Faculity]
       );
       idFaculty = dataFaculty.length > 0 ? dataFaculty[0].id : null; // Update index here
@@ -74,7 +74,7 @@ const importPoint = ({
 
       // check course
       const [dataCourse] = await connect.execute(
-        "select DISTINCT id from course where NameCourse = ?",
+        "select DISTINCT ID from course where NameCourse = ?",
         [Course]
       );
       idCourse = dataCourse.length > 0 ? dataCourse[0].id : null; // Update index here
@@ -219,7 +219,7 @@ const selectCourseByIdClass = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        "SELECT DISTINCT course.id, course.NameCourse from class INNER JOIN  class_course on class_course.IDClass = ? INNER JOIN course on course.ID = class_course.IDCourse",
+        "SELECT DISTINCT course.ID, course.NameCourse from class INNER JOIN  class_course on class_course.IDClass = ? INNER JOIN course on course.ID = class_course.IDCourse",
         [id]
       );
       if (result?.length > 0) {
@@ -248,11 +248,31 @@ const selectPointClass = ({ IdFaculty, idClass, idCourse }) => {
         "SELECT user.Msv, user.FullName, user.Gender, point.Frequent, point.MidtermScore, point.FinalExamScore, point.AverageScore, point.Scores, point.LetterGrades, point.Note from user INNER JOIN userinrole on userinrole.UserID = user.ID and user.IDClass = ?  INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_faculty on user_faculty.IDUser = user.ID INNER JOIN faculty on faculty.ID = ? INNER JOIN user_course on user.ID = user_course.IDUser INNER JOIN course on course.ID = user_course.IDCourse INNER JOIN point on point.IDUser = user.ID and point.IDCourse = ?",
         [idClass, IdFaculty, idCourse]
       );
-      if (result && result.length > 0) {
+
+      const [teacherData] = await connection.execute(
+        `SELECT user.FullName, class.NameClass, faculty.FacultyName 
+        FROM user 
+        INNER JOIN userinrole ON user.ID = userinrole.UserID 
+        INNER JOIN role ON role.ID = userinrole.RoleID AND role.ID = 2 
+        INNER JOIN class ON class.ID = user.IDClass and class.ID = ?
+        INNER JOIN faculty ON faculty.ID = class.IDFaculty and faculty.id = ?
+        INNER JOIN user_course ON user_course.IDUser = user.ID 
+        INNER JOIN course ON course.ID = user_course.IDCourse AND course.id = ?;  
+      `,
+        [idClass, IdFaculty, idCourse]
+      );
+
+      if (
+        result &&
+        result.length > 0 &&
+        teacherData &&
+        teacherData.length > 0
+      ) {
         resolve({
           status: 200,
           message: "Get Data Point Student Done",
-          data: result,
+          dataTeacher: teacherData,
+          dataStudents: result,
         });
       } else {
         resolve({
