@@ -317,7 +317,7 @@ const selectPointClass = ({ IdFaculty, idClass, idCourse }) => {
         `SELECT user.FullName, class.NameClass, faculty.FacultyName 
         FROM user 
         INNER JOIN userinrole ON user.ID = userinrole.UserID 
-        INNER JOIN role ON role.ID = userinrole.RoleID AND role.ID = 2 
+        INNER JOIN role ON role.ID = userinrole.RoleID AND role.ID = 3
         INNER JOIN class ON class.ID = user.IDClass and class.ID = ?
         INNER JOIN faculty ON faculty.ID = class.IDFaculty and faculty.id = ?
         INNER JOIN user_course ON user_course.IDUser = user.ID 
