@@ -1,4 +1,4 @@
-import * as hendleAttenDance from "../services/attenDanceServices.js";
+import * as hendleAttenDance from '../services/attenDanceServices.js';
 const allFaculty = async (_, res) => {
   try {
     const respon = await hendleAttenDance.allFaculty();
@@ -7,7 +7,7 @@ const allFaculty = async (_, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An Error from allFaculty",
+      message: 'An Error from allFaculty',
     });
   }
 };
@@ -28,7 +28,7 @@ const classByIdFaculty = async (req, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An Error from classByIdFaculty",
+      message: 'An Error from classByIdFaculty',
     });
   }
 };
@@ -48,9 +48,23 @@ const courseByIdClass = async (req, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An Error from classByIdFaculty",
+      message: 'An Error from classByIdFaculty',
     });
   }
 };
 
-export { allFaculty, classByIdFaculty, courseByIdClass };
+const importAttendance = async (req, res) => {
+  try {
+    const data = req.body;
+    const respon = await hendleAttenDance.importAttendance(data);
+    return res.status(200).json(respon);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      status: 500,
+      message: 'An Error from importAttendance',
+    });
+  }
+};
+
+export { allFaculty, classByIdFaculty, courseByIdClass, importAttendance };

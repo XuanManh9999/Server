@@ -1,4 +1,4 @@
-import * as userServices from "../services/userServices.js";
+import * as userServices from '../services/userServices.js';
 
 //Đăng nhập
 const UserLogin = async (req, res) => {
@@ -14,41 +14,42 @@ const UserLogin = async (req, res) => {
     } else {
       return res.status(400).json({
         status: 400,
-        message: "Please enter complete information to continue",
+        message: 'Please enter complete information to continue',
       });
     }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An error occurred on the server",
+      message: 'An error occurred on the server',
     });
   }
 };
 // Đăng Ký
 const UserRegister = async (req, res) => {
   try {
-    const { UserName, Password, FullName, Email, Avatar } = req.body;
+    // const { UserName, Password, FullName, Email, Avatar } = req.body;
+    const { UserName, Password, FullName, Email } = req.body;
+
     if (UserName && Password && FullName && Email) {
       const response = await userServices.UserRegister({
         UserName,
         Password,
         FullName,
         Email,
-        Avatar,
       });
       return res.status(200).json(response);
     } else {
       return res.status(400).json({
         status: 400,
-        message: "Please enter complete information to continue",
+        message: 'Please enter complete information to continue',
       });
     }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An error occurred on the server",
+      message: 'An error occurred on the server',
     });
   }
 };
@@ -62,14 +63,14 @@ const ForgotPassword = async (req, res) => {
     } else {
       return res.status(404).json({
         status: 404,
-        message: "The user has not entered enough information to continue",
+        message: 'The user has not entered enough information to continue',
       });
     }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An error occurred on the server",
+      message: 'An error occurred on the server',
     });
   }
 };
@@ -82,7 +83,7 @@ const UserData = async (req, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An error occurred on the server",
+      message: 'An error occurred on the server',
     });
   }
 };
@@ -96,14 +97,14 @@ const UserById = async (req, res) => {
     } else {
       return res.status(400).json({
         status: 400,
-        message: "Please enter complete information to continue",
+        message: 'Please enter complete information to continue',
       });
     }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: "An error occurred on the server",
+      message: 'An error occurred on the server',
     });
   }
 };
@@ -115,7 +116,7 @@ const hendleTest = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       err: err,
-      message: "ERR FROM SERVER",
+      message: 'ERR FROM SERVER',
     });
   }
 };

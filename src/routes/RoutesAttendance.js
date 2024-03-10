@@ -5,5 +5,8 @@ const router = express.Router();
 router.get('/all-faculty', hendleAttenDance.allFaculty);
 router.get('/class-by-id-faculty/:id', hendleAttenDance.classByIdFaculty);
 router.get('/course-by-id-class/:id', hendleAttenDance.courseByIdClass);
+router.post('/import-attendance', hendleAttenDance.importAttendance);
+
+
 
 export default router;

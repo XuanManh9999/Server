@@ -1,17 +1,17 @@
-import { pool as connection } from "../config/db.js";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
+import { pool as connection } from '../config/db.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 const generateAcessToken = (data) => {
   const access_token = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1m",
+    expiresIn: '1m',
   });
   return access_token;
 };
 
 const generateRefreshToken = (data) => {
   const refresh_token = jwt.sign(data, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "365d",
+    expiresIn: '365d',
   });
   return refresh_token;
 };
@@ -22,14 +22,14 @@ const UserLogin = ({ Email, Password, res }) => {
     try {
       // Tìm
       const [results] = await connection.execute(
-        "SELECT * FROM user WHERE Email = ?",
+        'SELECT * FROM user WHERE Email = ?',
         [Email]
       );
 
       if (results.length === 0) {
         resolve({
           status: 404,
-          message: "Email does not exist in the system",
+          message: 'Email does not exist in the system',
         });
         return;
       }
@@ -39,7 +39,7 @@ const UserLogin = ({ Email, Password, res }) => {
       if (IsCheckPassword) {
         const _idUser = results[0].ID;
         const [roleUser] = await connection.execute(
-          "SELECT user.id, name FROM user INNER JOIN userinrole ON user.ID = userinrole.UserID INNER JOIN role ON userinrole.RoleID = role.ID AND user.ID = ?",
+          'SELECT user.id, name FROM user INNER JOIN userinrole ON user.ID = userinrole.UserID INNER JOIN role ON userinrole.RoleID = role.ID AND user.ID = ?',
           [_idUser]
         );
 
@@ -47,7 +47,7 @@ const UserLogin = ({ Email, Password, res }) => {
           resolve({
             status: 500,
             message:
-              "There is an error on the server side. The error is in the database, which cannot find administrator permissions to authenticate",
+              'There is an error on the server side. The error is in the database, which cannot find administrator permissions to authenticate',
           });
           return;
         }
@@ -63,21 +63,21 @@ const UserLogin = ({ Email, Password, res }) => {
 
         // Cập nhật Refresh lưu vào DB
         await connection.execute(
-          "UPDATE user SET RefreshToken = ? WHERE ID = ?",
+          'UPDATE user SET RefreshToken = ? WHERE ID = ?',
           [refresh_token, roleUser[0].id]
         );
 
         // Lưu Refresh Token vào cookie
-        res.cookie("refreshToken", refresh_token, {
+        res.cookie('refreshToken', refresh_token, {
           httpOnly: false,
           maxAge: 60 * 60 * 24 * 365 * 1000, // 365 ngày, đơn vị là miligiây
-          path: "/",
-          sameSite: "strict",
+          path: '/',
+          sameSite: 'strict',
         });
 
         resolve({
           status: 200,
-          message: "OK",
+          message: 'OK',
           UserName: results[0].UserName,
           FullName: results[0].FullName,
           Email: results[0].Email,
@@ -87,7 +87,7 @@ const UserLogin = ({ Email, Password, res }) => {
       } else {
         resolve({
           status: 404,
-          message: "The password does not match the email provided",
+          message: 'The password does not match the email provided',
         });
       }
     } catch (err) {
@@ -99,18 +99,12 @@ const UserLogin = ({ Email, Password, res }) => {
 // Quên mật khẩu
 // Băm mật khẩu mới
 
-const UserRegister = async ({
-  UserName,
-  Password,
-  FullName,
-  Email,
-  Avatar,
-}) => {
+const UserRegister = async ({ UserName, Password, FullName, Email }) => {
   let connect;
   try {
     connect = await connection.getConnection();
     if (!connect) {
-      throw new Error("Connection is undefined or null.");
+      throw new Error('Connection is undefined or null.');
     }
     // Bắt đầu giao dịch
     await connect.beginTransaction();
@@ -119,13 +113,13 @@ const UserRegister = async ({
     const salt = +process.env.SALT;
     const hashPassword = bcrypt.hashSync(Password, salt);
     const [userInsertResult] = await connect.execute(
-      "INSERT INTO user (UserName, Password, FullName, Email, Avatar) VALUES (?, ?, ?, ?, ?)",
-      [UserName, hashPassword, FullName, Email, Avatar]
+      'INSERT INTO user (UserName, Password, FullName, Email) VALUES (?, ?, ?, ?, ?)',
+      [UserName, hashPassword, FullName, Email]
     );
 
     // Thực hiện truy vấn thứ hai
     const [userInRoleResult] = await connect.execute(
-      "INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)",
+      'INSERT INTO userinrole (UserID, RoleID) VALUES (?, ?)',
       [userInsertResult.insertId, 3]
     );
 
@@ -135,7 +129,7 @@ const UserRegister = async ({
     // Trả về kết quả
     return {
       status: 200,
-      message: "Đăng ký tài khoản thành công",
+      message: 'Đăng ký tài khoản thành công',
       data: userInRoleResult,
     };
   } catch (err) {
@@ -151,29 +145,29 @@ const UserRegister = async ({
 
 const generateRandomPassword = (length) => {
   const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
   const password = Array.from(crypto.randomFillSync(new Uint32Array(length)))
     .map((value) => characters[value % characters.length])
-    .join("");
+    .join('');
   return password;
 };
 
 const ForgotPassword = async (Email) => {
   try {
     const [results] = await connection.execute(
-      "SELECT * FROM user WHERE email = ?",
+      'SELECT * FROM user WHERE email = ?',
       [Email]
     );
 
     if (results.length === 0) {
       return {
         status: 401,
-        message: "No account exists in the system",
+        message: 'No account exists in the system',
       };
     } else {
       return {
         status: 200,
-        message: "OK",
+        message: 'OK',
         newPassword: generateRandomPassword(12),
       };
     }
@@ -186,23 +180,23 @@ const ForgotPassword = async (Email) => {
 const UserData = async () => {
   try {
     if (!connection) {
-      throw new Error("Connection is undefined or null.");
+      throw new Error('Connection is undefined or null.');
     }
 
     const [results] = await connection.execute(
-      "SELECT ID, UserName, FullName, Email, Avatar FROM user"
+      'SELECT ID, UserName, FullName, Email, Avatar FROM user'
     );
 
     if (results.length === 0) {
       return {
         status: 401,
-        message: "Data is empty",
+        message: 'Data is empty',
         data: results,
       };
     } else {
       return {
         status: 200,
-        message: "OK",
+        message: 'OK',
         data: results,
       };
     }
@@ -215,23 +209,23 @@ const UserData = async () => {
 const UserById = async (id) => {
   try {
     if (!connection) {
-      throw new Error("Connection is undefined or null.");
+      throw new Error('Connection is undefined or null.');
     }
 
     const [result] = await connection.execute(
-      "SELECT ID, UserName, FullName, Email, Avatar FROM user WHERE ID = ?",
+      'SELECT ID, UserName, FullName, Email, Avatar FROM user WHERE ID = ?',
       [id]
     );
 
     if (result.length === 0) {
       return {
         status: 401,
-        message: "The user does not exist in the system",
+        message: 'The user does not exist in the system',
       };
     } else {
       return {
         status: 400,
-        message: "OK",
+        message: 'OK',
         data: result,
       };
     }
@@ -245,17 +239,17 @@ const hendleTest = async (data) => {
   try {
     const { UserName, Password, fullName, Email, Avatar } = data;
     const res = await connection.execute(
-      "insert into user (UserName, Password, FullName, Email, Avatar) VALUES (?, ?, ?, ?, ?)",
+      'insert into user (UserName, Password, FullName, Email, Avatar) VALUES (?, ?, ?, ?, ?)',
       [UserName, Password, fullName, Email, Avatar]
     );
     return {
-      status: "OK",
-      messege: "Thêm Thành Công",
+      status: 'OK',
+      messege: 'Thêm Thành Công',
     };
   } catch (err) {
     return {
-      status: "ERR",
-      messege: "Thêm Không Thành Công",
+      status: 'ERR',
+      messege: 'Thêm Không Thành Công',
     };
   }
 };
