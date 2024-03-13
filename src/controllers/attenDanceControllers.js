@@ -1,3 +1,4 @@
+import e from 'express';
 import * as hendleAttenDance from '../services/attenDanceServices.js';
 const allFaculty = async (_, res) => {
   try {
@@ -55,9 +56,24 @@ const courseByIdClass = async (req, res) => {
 
 const importAttendance = async (req, res) => {
   try {
-    const data = req.body;
-    const respon = await hendleAttenDance.importAttendance(data);
-    return res.status(200).json(respon);
+    const { Faculty, Class, Course, Semester, SchoolYear, DataAttendance } =
+      req.body;
+    if (
+      Faculty &&
+      Class &&
+      Course &&
+      Semester &&
+      SchoolYear &&
+      DataAttendance
+    ) {
+      const respon = await hendleAttenDance.importAttendance(req.body);
+      return res.status(200).json(respon);
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: 'Data is not enough',
+      });
+    }
   } catch (err) {
     console.log(err);
     return res.status(500).json({

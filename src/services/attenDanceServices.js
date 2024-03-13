@@ -1,21 +1,21 @@
-import { pool as connection } from "../config/db.js";
+import { pool as connection } from '../config/db.js';
 
 const allFaculty = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        "select ID, FacultyName from faculty"
+        'select ID, FacultyName from faculty'
       );
       if (result?.length > 0) {
         resolve({
           status: 200,
-          message: "Get data faculty done",
+          message: 'Get data faculty done',
           data: result,
         });
       } else {
         resolve({
           status: 403,
-          message: "Data faculty is empty",
+          message: 'Data faculty is empty',
           data: [],
         });
       }
@@ -28,19 +28,19 @@ const classByIdFaculty = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        "SELECT ID, NameClass from class where IDFaculty = ?",
+        'SELECT ID, NameClass from class where IDFaculty = ?',
         [id]
       );
       if (result?.length > 0) {
         resolve({
           status: 200,
-          message: "Get data class done",
+          message: 'Get data class done',
           data: result,
         });
       } else {
         resolve({
           status: 403,
-          message: "Data class is empty",
+          message: 'Data class is empty',
           data: [],
         });
       }
@@ -53,19 +53,19 @@ const courseByIdClass = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        "SELECT DISTINCT course.ID, course.NameCourse from class INNER JOIN  class_course on class_course.IDClass = ? INNER JOIN course on course.ID = class_course.IDCourse",
+        'SELECT DISTINCT course.ID, course.NameCourse from class INNER JOIN  class_course on class_course.IDClass = ? INNER JOIN course on course.ID = class_course.IDCourse',
         [id]
       );
       if (result?.length > 0) {
         resolve({
           status: 200,
-          message: "Get Data Courses By Id Class Done",
+          message: 'Get Data Courses By Id Class Done',
           data: result,
         });
       } else {
         resolve({
           status: 200,
-          message: "Get Data Courses By Id Class Is Empty",
+          message: 'Get Data Courses By Id Class Is Empty',
           data: [],
         });
       }
@@ -75,4 +75,176 @@ const courseByIdClass = (id) => {
   });
 };
 
-export { allFaculty, classByIdFaculty, courseByIdClass };
+const importAttendance = ({
+  Faculty,
+  Class,
+  Course,
+  Semester,
+  SchoolYear,
+  DataAttendance,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    let connect;
+    let idFaculty;
+    let idClass;
+    let idCourse;
+    let idStudent;
+    try {
+      connect = await connection.getConnection();
+      if (!connect) {
+        throw new Error('Connection is undefined or null.');
+      }
+      await connect.beginTransaction();
+      // check khoa
+      const [faculty] = await connect.execute(
+        'SELECT DISTINCT ID FROM faculty WHERE FacultyName = ?',
+        [Faculty]
+      );
+
+      idFaculty = faculty.length > 0 ? faculty[0].ID : null;
+      if (idFaculty === null) {
+        // them khoa
+        const [result] = await connect.execute(
+          'insert into faculty (FacultyName) values (?)',
+          [Faculty]
+        );
+        idFaculty = result.insertId;
+      }
+      // check class
+      const [classs] = await connect.execute(
+        'SELECT ID FROM class WHERE NameClass = ?',
+        [Class]
+      );
+      idClass = classs.length > 0 ? classs[0].ID : null;
+      if (idClass === null) {
+        // them class
+        const [result] = await connect.execute(
+          'insert into class (NameClass, IDFaculty) values (?, ?)',
+          [Class, idFaculty]
+        );
+        idClass = result.insertId;
+      }
+      // check course
+      const [course] = await connect.execute(
+        'SELECT ID FROM course WHERE NameCourse = ?',
+        [Course]
+      );
+      idCourse = course.length > 0 ? course[0].ID : null;
+      if (idCourse === null) {
+        // them course
+        const [result] = await connect.execute(
+          'insert into course (NameCourse) values (?)',
+          [Course]
+        );
+        idCourse = result.insertId;
+      }
+      if (DataAttendance?.length > 0) {
+        for (let i = 0; i < DataAttendance.length; i++) {
+          const { Msv, FullName, DateOfBirth, Comment, Attendance } =
+            DataAttendance[i];
+          // check student
+          const [student] = await connect.execute(
+            'SELECT ID FROM user WHERE Msv = ?',
+            [Msv]
+          );
+          idStudent = student.length > 0 ? student[0].ID : null;
+          if (idStudent === null) {
+            // them student
+            const [result] = await connect.execute(
+              'insert into user (Msv, FullName, DateOfBirth, IDClass) values (?, ?, ?, ?)',
+              [Msv, FullName, DateOfBirth, idClass]
+            );
+            idStudent = result.insertId;
+
+            // thêm quyền
+            await connect.execute(
+              'insert into userinrole (UserID, RoleID) values (?, ?)',
+              [idStudent, 3]
+            );
+
+            // thêm người dùng học môn học đó
+            await connect.execute(
+              'insert into user_course (IDUser, IDCourse) values (?, ?)',
+              [idStudent, idCourse]
+            );
+          }
+
+          // them diem danh
+          if (Attendance?.length > 0) {
+            for (let j = 0; j < Attendance.length; j++) {
+              const { Day, AttendanceStatus } = Attendance[j];
+              // check xem đã có sinh viên đó chưa?
+              const [existingRecord] = await connect.execute(
+                'SELECT ID FROM attendance WHERE IDStudent = ? AND Day = ? AND IDCourse = ?',
+                [idStudent, Day, idCourse]
+              );
+
+              if (existingRecord?.length === 0) {
+                await connect.execute(
+                  'insert into attendance (Semester, SchoolYear, IDStudent, IDCourse, Day, AttendanceStatus) values (?, ?, ?, ?, ?, ?)',
+                  [
+                    Semester,
+                    SchoolYear,
+                    idStudent,
+                    idCourse,
+                    Day,
+                    AttendanceStatus,
+                  ]
+                );
+              } else {
+                await connect.execute(
+                  'update attendance set Semester = ?, SchoolYear = ?, AttendanceStatus = ? where IDStudent = ? and Day = ? and IDCourse = ?',
+                  [
+                    Semester,
+                    SchoolYear,
+                    AttendanceStatus,
+                    idStudent,
+                    Day,
+                    idCourse,
+                  ]
+                );
+              }
+            }
+          }
+          // thêm comment
+          if (Comment) {
+            // cần update comment
+            // check comment
+            const [check] = await connect.execute(
+              'SELECT * FROM commentattendance WHERE IDStudent = ? AND IDCourse = ?',
+              [idStudent, idCourse]
+            );
+            if (!check.length) {
+              await connect.execute(
+                'insert into commentattendance (IDStudent, IDCourse, Comment) values (?, ?, ?)',
+                [idStudent, idCourse, Comment]
+              );
+            } else {
+              await connect.execute(
+                'update commentattendance set Comment = ? where IDStudent = ? and IDCourse = ?',
+                [Comment, idStudent, idCourse]
+              );
+            }
+          } else {
+            await connect.execute(
+              'insert into commentattendance (IDStudent, IDCourse, Comment) values (?, ?, ?)',
+              [idStudent, idCourse, '']
+            );
+          }
+        }
+      }
+      connect.commit();
+      resolve({
+        status: 200,
+        message: 'Import dữ liệu thành công',
+      });
+    } catch (err) {
+      if (connect) {
+        await connect.rollback();
+      }
+      reject(err);
+    }
+  });
+};
+
+export { allFaculty, classByIdFaculty, courseByIdClass, importAttendance };

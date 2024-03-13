@@ -78,6 +78,7 @@ const importPoint = ({
         'select DISTINCT ID from course where NameCourse = ?',
         [Course]
       );
+
       idCourse = dataCourse.length > 0 ? dataCourse[0].ID : null; // Update index here
       if (idCourse === null) {
         // thêm course
@@ -114,6 +115,7 @@ const importPoint = ({
           idClass,
         ]);
       }
+
       if (
         DataStudents?.length > 0 &&
         DataPoint.length > 0 &&
@@ -168,6 +170,9 @@ const importPoint = ({
             'SELECT * from user_course as q where q.IDUser = ? and q.IDCourse = ?',
             [idStudent, idCourse]
           );
+
+          
+        
           if (checkUserCourse.length === 0) {
             await connect.execute(
               'insert into user_course (IDUser, IDCourse) values (?, ?)',
