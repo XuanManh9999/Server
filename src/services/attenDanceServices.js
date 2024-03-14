@@ -247,4 +247,76 @@ const importAttendance = ({
   });
 };
 
-export { allFaculty, classByIdFaculty, courseByIdClass, importAttendance };
+const selectAttendance = (IdFaculty, IdClass, IdCourse) =>
+  new Promise(async (resolve, reject) => {
+    let idStudent = [];
+    let listAttendance = [];
+    let listComment = [];
+    let data = {};
+
+    try {
+      let [listStudent] = await connection.execute(
+        `SELECT DISTINCT faculty.FacultyName, class.NameClass, course.NameCourse, user.ID, user.Msv, user.FullName, user.DateOfBirth from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN faculty on faculty.ID = ? INNER JOIN class on class.IDFaculty = ? and class.ID = ? INNER JOIN user_course on user_course.IDUser = user.ID INNER JOIN course on course.ID = user_course.IDCourse and course.ID = ?`,
+        [IdFaculty, IdFaculty, IdClass, IdCourse]
+      );
+
+      // getIDStudent
+      for (let i = 0; i < listStudent.length; i++) {
+        idStudent.push(listStudent[i].ID);
+      }
+      // lấy thông tin điểm danh
+
+      for (let i = 0; i < idStudent.length; i++) {
+        const [resultAttendance] = await connection.execute(
+          `SELECT  attendance.SchoolYear, attendance.Semester,  attendance.AttendanceStatus, attendance.Day FROM attendance WHERE IDStudent = ? and IDCourse = ?`,
+          [idStudent[i], IdCourse]
+        );
+        const [resultComment] = await connection.execute(
+          `SELECT commentattendance.Comment FROM commentattendance WHERE IDStudent = ? and IDCourse = ?`,
+          [idStudent[i], IdCourse]
+        );
+        listAttendance.push(resultAttendance);
+        listComment.push(resultComment[0]);
+      }
+
+      // gom dữ liệu lại
+      if (idStudent?.length > 0) {
+        data = {
+          Faculty: listStudent[0].FacultyName,
+          Class: listStudent[0].NameClass,
+          Course: listStudent[0].NameCourse,
+          DataAttendance: [],
+        };
+      }
+
+      if (listAttendance.length > 0) {
+        for (let i = 0; i < listAttendance.length; i++) {
+          let temp = {
+            Msv: listStudent[i].Msv,
+            FullName: listStudent[i].FullName,
+            DateOfBirth: listStudent[i].DateOfBirth,
+            Comment: listComment[i]?.Comment ?? '',
+            Attendance: listAttendance[i],
+          };
+          data.DataAttendance.push(temp);
+        }
+      }
+      resolve({
+        status: 200,
+        message: 'Lấy dữ liệu điểm danh thành công',
+        data: data,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export {
+  allFaculty,
+  classByIdFaculty,
+  courseByIdClass,
+  importAttendance,
+  selectAttendance,
+};
+// lấy ra sinh viên
+// Lấy ra thông tin điểm danh và cho vào một mảng
