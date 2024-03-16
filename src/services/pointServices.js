@@ -171,8 +171,6 @@ const importPoint = ({
             [idStudent, idCourse]
           );
 
-          
-        
           if (checkUserCourse.length === 0) {
             await connect.execute(
               'insert into user_course (IDUser, IDCourse) values (?, ?)',
