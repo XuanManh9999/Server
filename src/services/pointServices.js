@@ -308,12 +308,12 @@ const selectCourseByIdClass = (id) => {
   });
 };
 
-const selectPointClass = ({ IdFaculty, idClass, idCourse }) => {
+const selectPointClass = ({ IdFaculty, IdClass, IdCourse }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
         'SELECT DISTINCT user.Msv, user.FullName, user.Gender, point.Frequent, point.MidtermScore, point.FinalExamScore, point.AverageScore, point.Scores, point.LetterGrades, point.Note from user INNER JOIN userinrole on userinrole.UserID = user.ID and user.IDClass = ?  INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_faculty on user_faculty.IDUser = user.ID INNER JOIN faculty on faculty.ID = ? INNER JOIN user_course on user.ID = user_course.IDUser INNER JOIN course on course.ID = user_course.IDCourse INNER JOIN point on point.IDUser = user.ID and point.IDCourse = ?',
-        [idClass, IdFaculty, idCourse]
+        [IdClass, IdFaculty, IdCourse]
       );
 
       const [teacherData] = await connection.execute(
@@ -326,7 +326,7 @@ const selectPointClass = ({ IdFaculty, idClass, idCourse }) => {
         INNER JOIN user_course ON user_course.IDUser = user.ID 
         INNER JOIN course ON course.ID = user_course.IDCourse AND course.id = ?;  
       `,
-        [idClass, IdFaculty, idCourse]
+        [IdClass, IdFaculty, IdCourse]
       );
 
       if (

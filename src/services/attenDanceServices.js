@@ -137,6 +137,12 @@ const importAttendance = ({
           [Course]
         );
         idCourse = result.insertId;
+
+        //them class_course học môn học đó
+        await connect.execute(
+          'insert into class_course (IDClass, IDCourse) values (?, ?)',
+          [idClass, idCourse]
+        );
       }
       if (DataAttendance?.length > 0) {
         for (let i = 0; i < DataAttendance.length; i++) {
@@ -233,6 +239,7 @@ const importAttendance = ({
           }
         }
       }
+
       connect.commit();
       resolve({
         status: 200,

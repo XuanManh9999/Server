@@ -1,11 +1,11 @@
 // Common
-import express from "express";
-import bodyParser from "body-parser";
-import cookieParser from "cookie-parser";
-import "dotenv/config";
-import cors from "cors";
+import express from 'express';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import 'dotenv/config';
+import cors from 'cors';
 
-import main from "./src/routes/index.js";
+import main from './src/routes/index.js';
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -16,5 +16,5 @@ main(app);
 
 const port = process.env.PORT || 1221;
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+  console.log(`Example app listening on port ${port}`);
 });
