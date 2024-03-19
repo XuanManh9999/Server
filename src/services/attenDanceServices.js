@@ -137,8 +137,14 @@ const importAttendance = ({
           [Course]
         );
         idCourse = result.insertId;
+      }
 
-        //them class_course học môn học đó
+      const [checkClass_course] = await connect.execute(
+        'select * from class_course where  class_course.IDClass = ? and class_course.IDCourse = ?',
+        [idClass, idCourse]
+      );
+
+      if (checkClass_course.length === 0) {
         await connect.execute(
           'insert into class_course (IDClass, IDCourse) values (?, ?)',
           [idClass, idCourse]
