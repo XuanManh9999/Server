@@ -8,6 +8,4 @@ router.get('/course-by-id-class/:id', hendleAttenDance.courseByIdClass);
 router.post('/import-attendance', hendleAttenDance.importAttendance);
 router.get('/select-attendance', hendleAttenDance.selectAttendance);
 
-
-
 export default router;
