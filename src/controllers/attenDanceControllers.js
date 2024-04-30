@@ -1,5 +1,5 @@
-import e from 'express';
-import * as hendleAttenDance from '../services/attenDanceServices.js';
+import e from "express";
+import * as hendleAttenDance from "../services/attenDanceServices.js";
 const allFaculty = async (_, res) => {
   try {
     const respon = await hendleAttenDance.allFaculty();
@@ -8,7 +8,7 @@ const allFaculty = async (_, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: 'An Error from allFaculty',
+      message: "An Error from allFaculty",
     });
   }
 };
@@ -29,7 +29,7 @@ const classByIdFaculty = async (req, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: 'An Error from classByIdFaculty',
+      message: "An Error from classByIdFaculty",
     });
   }
 };
@@ -49,7 +49,7 @@ const courseByIdClass = async (req, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: 'An Error from classByIdFaculty',
+      message: "An Error from classByIdFaculty",
     });
   }
 };
@@ -71,14 +71,14 @@ const importAttendance = async (req, res) => {
     } else {
       return res.status(400).json({
         status: 400,
-        message: 'Data is not enough',
+        message: "Data is not enough",
       });
     }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: 'An Error from importAttendance',
+      message: "An Error from importAttendance",
     });
   }
 };
@@ -96,14 +96,14 @@ const selectAttendance = async (req, res) => {
     } else {
       return res.status(400).json({
         status: 400,
-        message: 'Data is not enough',
+        message: "Data is not enough",
       });
     }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: 'An Error from selectAttendance',
+      message: "An Error from selectAttendance",
     });
   }
 };

@@ -15,6 +15,7 @@ const authMiddlewareAdmin = (req, res, next) => {
         message: "The user is not authenticated, maybe the token has expired ",
       });
     }
+  
     if (admin.role === "Admin") {
       req.admin = user;
       next();

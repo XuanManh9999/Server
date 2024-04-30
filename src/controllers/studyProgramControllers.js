@@ -1,4 +1,4 @@
-import * as hendleStudyProgramServices from '../services/studyProgramServices.js';
+import * as hendleStudyProgramServices from "../services/studyProgramServices.js";
 
 const getAllStudyPrograms = async (_, res) => {
   try {
@@ -8,7 +8,7 @@ const getAllStudyPrograms = async (_, res) => {
     console.log(err);
     return res.status(500).json({
       status: 500,
-      message: 'An Error from getAllStudyPrograms',
+      message: "An Error from getAllStudyPrograms",
     });
   }
 };
