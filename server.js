@@ -11,9 +11,10 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
+console.log(process.env.CLIENT_URL);
 app.use(
   cors({
-    // origin: process.env.CLIENT_URL, // allow to server to accept request from different origin
+    origin: process.env.CLIENT_URL, // allow to server to accept request from different origin
     methods: ["GET", "POST", "PUT", "DELETE"], // allow to server to accept request from different method
   })
 );
