@@ -2,16 +2,8 @@ import { handleYearsStudent, selectfaculty } from "../services/index.js";
 
 export const selectYearsStudent = async (req, res) => {
   try {
-    const { facultyId } = req.query;
-    if (facultyId) {
-      const response = await handleYearsStudent({ facultyId });
-      return res.status(200).json(response);
-    } else {
-      return res.status(400).json({
-        status: 400,
-        message: "Faculty is not found",
-      });
-    }
+    const response = await handleYearsStudent();
+    return res.status(200).json(response);
   } catch (err) {
     return res.status(500).json({
       status: 500,
@@ -19,10 +11,19 @@ export const selectYearsStudent = async (req, res) => {
     });
   }
 };
-export const selectFaculty = async (_, res) => {
+export const selectFaculty = async (req, res) => {
   try {
-    const response = await selectfaculty();
-    return res.status(200).json(response);
+    const { key } = req.query;
+    if (key) {
+      const response = await selectfaculty({ key });
+      return res.status(200).json(response);
+    }else {
+      return res.status(400).json({
+        status: 400,
+        message: "Key is not found",
+      });
+    
+    }
   } catch (err) {
     console.log(err);
     return res.status(500).json({
