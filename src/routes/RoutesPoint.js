@@ -7,11 +7,14 @@ router.get("/select-all-faculty", hendlePoint.selectSeculty);
 router.get("/select-class-by-id/:id", hendlePoint.selectClassByID);
 
 router.post("/import-point", hendlePoint.importPoint);
+router.get(
+  "/select-courses-by-id-class/:id",
+  hendlePoint.selectCourseByIdClass
+);
 
-
-router.get("/select-courses-by-id-class/:id", hendlePoint.selectCourseByIdClass)
-
-
-router.get("/select-point-by-id-class-id-faculty-id-course", hendlePoint.selectPointClass)
+router.get(
+  "/select-point-by-id-class-id-faculty-id-course",
+  hendlePoint.selectPointClass
+);
 
 export default router;

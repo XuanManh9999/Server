@@ -3,6 +3,7 @@ import routerToken from "./RoutesToken.js";
 import routerPoint from "./RoutesPoint.js";
 import routerAttendance from "./RoutesAttendance.js";
 import routerStudyprogram from "./RoutesStudyprogram.js";
+import routerCommon from "./RoutesCommon.js";
 
 function app(express) {
   express.use("/api/v1/user", routerUser);
@@ -10,6 +11,7 @@ function app(express) {
   express.use("/api/v1/point", routerPoint);
   express.use("/api/v1/attendance", routerAttendance);
   express.use("/api/v1/studyprogram", routerStudyprogram);
+  express.use("/api/v1/common", routerCommon);
 }
 
 export default app;
