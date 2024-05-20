@@ -1,17 +1,4 @@
-import e from "express";
 import * as hendleAttenDance from "../services/attenDanceServices.js";
-const allFaculty = async (_, res) => {
-  try {
-    const respon = await hendleAttenDance.allFaculty();
-    return res.status(200).json(respon);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      status: 500,
-      message: "An Error from allFaculty",
-    });
-  }
-};
 
 const classByIdFaculty = async (req, res) => {
   try {
@@ -109,7 +96,6 @@ const selectAttendance = async (req, res) => {
 };
 
 export {
-  allFaculty,
   classByIdFaculty,
   courseByIdClass,
   importAttendance,

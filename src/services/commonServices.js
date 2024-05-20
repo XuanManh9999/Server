@@ -36,3 +36,28 @@ export const handleYearsStudent = ({ facultyId }) =>
       reject(err);
     }
   });
+
+export const selectfaculty = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "select DISTINCT ID, FacultyName from faculty"
+      );
+      if (result?.length > 0) {
+        resolve({
+          status: 200,
+          message: "Get data faculty done",
+          data: result,
+        });
+      } else {
+        resolve({
+          status: 403,
+          message: "Data faculty is empty",
+          data: [],
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
