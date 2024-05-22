@@ -6,3 +6,4 @@ export * from "./tokenServices.js";
 export * from "./studentServices.js";
 export * from "./commonServices.js";
 export * from "./facultyServices.js";
+export * from "./classServices.js";

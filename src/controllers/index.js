@@ -6,3 +6,4 @@ export * from "./tokenControllers.js";
 export * from "./studentsControllers.js";
 export * from "./commonControllor.js";
 export * from "./facultyControllers.js";
+export * from './classControllers.js'
