@@ -3,6 +3,7 @@ import {
   handleUpdateFaculty,
   handleDeleteFaculty,
   handleImportFaculty,
+  handleSelectAllFaculty,
 } from "../services/index.js";
 
 export const addFaculty = async (req, res) => {
@@ -89,6 +90,18 @@ export const importFaculty = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An Error From Server With API importFaculty",
+    });
+  }
+};
+
+export const selectAllFaculty = async (_, res) => {
+  try {
+    const response = await handleSelectAllFaculty();
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An Error From Server With API selectAllFaculty",
     });
   }
 };

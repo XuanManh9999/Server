@@ -95,6 +95,7 @@ export const handleSelectClassByFacultyAndKey = (key, faculty) =>
         "SELECT * FROM class WHERE IDFaculty = ?",
         [faculty]
       );
+
       const newData = result.filter((item) => {
         const keyClass = item?.NameClass.split(".")[0].match(/\d+/g);
         return keyClass && keyClass[0] === key; // return true or false

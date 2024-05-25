@@ -3,7 +3,6 @@ import { pool as connection } from "../config/db.js";
 export const handleAddFaculty = (data) =>
   new Promise(async (resolve, reject) => {
     try {
-      console.log(new Date());
       const { facultyName, founding, desc, email, phoneNumber } = data;
       const [result] = await connection.execute(
         "INSERT INTO faculty (FacultyName, Founding, `Describe`, Email, PhoneNumber) VALUES (?, ?, ?, ?, ?)",
@@ -84,6 +83,22 @@ export const handleImportFaculty = (listFaculty) =>
       resolve({
         status: 200,
         message: "Success Import Faculty",
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export const handleSelectAllFaculty = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT ID, FacultyName, Founding, `Describe`, Email, PhoneNumber FROM faculty"
+      );
+      resolve({
+        status: 200,
+        message: "Success Select All Faculty",
+        data: result,
       });
     } catch (err) {
       reject(err);
