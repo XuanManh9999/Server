@@ -87,3 +87,25 @@ export const selectfaculty = ({ key }) => {
     }
   });
 };
+
+export const handleSelectClassByFacultyAndKey = (key, faculty) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT * FROM class WHERE IDFaculty = ?",
+        [faculty]
+      );
+      const newData = result.filter((item) => {
+        const keyClass = item?.NameClass.split(".")[0].match(/\d+/g);
+        return keyClass && keyClass[0] === key; // return true or false
+      });
+
+      resolve({
+        status: 200,
+        message: "Success",
+        data: newData,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
