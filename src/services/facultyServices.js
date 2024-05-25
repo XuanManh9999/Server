@@ -60,3 +60,32 @@ export const handleDeleteFaculty = async (idFaculty) => {
     };
   }
 };
+export const handleImportFaculty = (listFaculty) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      for (let i = 0; i < listFaculty.length; i++) {
+        const [result] = await connection.execute(
+          "SELECT * FROM faculty WHERE FacultyName = ?",
+          [listFaculty[i]?.facultyName]
+        );
+        if (result.length === 0) {
+          await connection.execute(
+            "INSERT INTO faculty (FacultyName, Founding, `Describe`, Email, PhoneNumber) VALUES (?, ?, ?, ?, ?)",
+            [
+              listFaculty[i]?.facultyName,
+              listFaculty[i]?.founding,
+              listFaculty[i]?.desc,
+              listFaculty[i]?.email,
+              listFaculty[i]?.phoneNumber,
+            ]
+          );
+        }
+      }
+      resolve({
+        status: 200,
+        message: "Success Import Faculty",
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });

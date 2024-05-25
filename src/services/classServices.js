@@ -101,3 +101,27 @@ export const heandleSelectClassByIdFaculty = ({ IDFaculty }) =>
       reject(err);
     }
   });
+
+export const handleDataClass = (dataClass) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      for (let i = 0; i < dataClass.length; i++) {
+        const [check] = await connection.execute(
+          "SELECT * FROM class WHERE NameClass = ? AND IDFaculty = ?",
+          [dataClass[i].NameClass, dataClass[i].IDFaculty]
+        );
+        if (check.length === 0) {
+          await connection.execute(
+            `INSERT INTO class (NameClass, IDFaculty) VALUES (?, ?)`,
+            [dataClass[i].NameClass, dataClass[i].IDFaculty]
+          );
+        }
+      }
+      resolve({
+        status: 200,
+        message: "Import Class Success",
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });

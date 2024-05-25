@@ -12,7 +12,7 @@ function getUniqueFirstFourChars(dataArray) {
 }
 
 function getKhoaHoc(dataArray) {
-  return dataArray.map((item) => +item - process.env.START_YEAR - 1);
+  return dataArray.map((item) => +item - process.env.START_YEAR - 1).sort();
 }
 
 // handleSVThuocKey
@@ -69,7 +69,7 @@ export const selectfaculty = ({ key }) => {
         }
       }
       const listIDFaculty = Array.from(set_unique_name_faculty);
-      const listNameFaculty = []
+      const listNameFaculty = [];
       for (let i = 0; i < listIDFaculty.length; i++) {
         const [faculty] = await connection.execute(
           `SELECT ID, FacultyName FROM faculty WHERE ID = ${listIDFaculty[i]}`

@@ -3,6 +3,7 @@ import {
   heandleUpdateClass,
   heandleDeleteClass,
   heandleSelectClassByIdFaculty,
+  handleDataClass,
 } from "../services/index.js";
 
 export const createClass = async (req, res) => {
@@ -87,6 +88,26 @@ export const selectClassByIdFaculty = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An Error From Server With API selectClassByIdFaculty",
+    });
+  }
+};
+
+export const importClass = async (req, res) => {
+  try {
+    const dataClass = req.body;
+    if (dataClass && dataClass?.length > 0) {
+      const response = await handleDataClass(dataClass);
+      return res.status(200).json(response);
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: "DataClass is not found",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      status: 500,
+      message: "An Error From Server With API importClass",
     });
   }
 };

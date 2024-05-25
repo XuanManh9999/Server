@@ -4,10 +4,12 @@ import {
   updateClass,
   deleteClass,
   selectClassByIdFaculty,
+  importClass,
 } from "../controllers/index.js";
 
 const router = express.Router();
 
+router.post("/import-class", importClass);
 router.post("/add-class-by-faculty", createClass);
 router.get("/select-class-by-faculty", selectClassByIdFaculty);
 router.put("/update-class", updateClass);
