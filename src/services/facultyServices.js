@@ -78,6 +78,19 @@ export const handleImportFaculty = (listFaculty) =>
               listFaculty[i]?.phoneNumber,
             ]
           );
+        } else {
+          // Update Faculty
+          await connection.execute(
+            "UPDATE faculty SET FacultyName = ?, Founding = ?, `Describe` = ?, Email = ?, PhoneNumber = ? WHERE ID = ?",
+            [
+              listFaculty[i]?.facultyName,
+              listFaculty[i]?.founding,
+              listFaculty[i]?.desc,
+              listFaculty[i]?.email,
+              listFaculty[i]?.phoneNumber,
+              result[0]?.ID,
+            ]
+          );
         }
       }
       resolve({
