@@ -110,3 +110,49 @@ export const handleSelectClassByFacultyAndKey = (key, faculty) =>
       reject(err);
     }
   });
+
+const handleKi = (nam, thang) => {
+  const quyDinhThangKySau = [2, 3, 4, 5, 6, 7]; // ki cuoi cua nam
+  const quyDinhThangKyDau = [8, 9, 10, 11, 12, 1]; // ki dau cua nam
+  let thuocKi;
+  if (quyDinhThangKySau.includes(thang)) {
+    thuocKi = 2;
+  } else if (quyDinhThangKyDau.includes(thang)) {
+    thuocKi = 1;
+  }
+  const newNam = thang >= 8 || thang === 1 ? nam + 1 : nam;
+  let KiThat;
+  KiThat = thang >= 2 && thang <= 7 ? newNam * 2 : newNam * 2 - 1;
+
+  return {
+    ky: thuocKi,
+    nam: newNam,
+    kyThucTe: KiThat,
+  };
+};
+
+export const handleSelectSemesterByKey = (key) =>
+  new Promise((resolve, reject) => {
+    try {
+      const timeNow = new Date();
+      const yearNow = timeNow.getFullYear();
+      const monthNow = timeNow.getMonth() + 1;
+      const namHoc = Number(yearNow) - Number(process.env.START_YEAR) - 1 - key;
+      const { nam, kyThucTe } = handleKi(namHoc, monthNow);
+      const listKy = [];
+      for (let i = 1; i <= kyThucTe; i++) {
+        listKy.push(i);
+      }
+      resolve({
+        status: 200,
+        message: "Success",
+        data: {
+          nam,
+          listKy,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      reject(err);
+    }
+  });

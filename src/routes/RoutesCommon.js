@@ -1,6 +1,11 @@
 // Viết những api dùng chung trong dự án
 import express from "express";
-import { selectYearsStudent, selectFaculty, selectClassByFacultyAndKey } from "../controllers/index.js";
+import {
+  selectYearsStudent,
+  selectFaculty,
+  selectClassByFacultyAndKey,
+  selectSemesterByKey,
+} from "../controllers/index.js";
 const router = express.Router();
 // Lấy khoa theo khóa
 router.get("/select-all-faculty", selectFaculty);
@@ -9,6 +14,9 @@ router.get("/select-all-faculty", selectFaculty);
 router.get("/select-years-by-faculty", selectYearsStudent);
 
 // Lấy lớp theo khóa, theo khoa
-router.get('/select-class-by-faculty-and-key', selectClassByFacultyAndKey);
+router.get("/select-class-by-faculty-and-key", selectClassByFacultyAndKey);
+
+// Lấy kỳ học theo khóa
+router.get("/select-semester-by-key", selectSemesterByKey);
 
 export default router;
