@@ -1,8 +1,13 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
-import * as hendleStudyProgramsController from '../controllers/studyProgramControllers.js';
+import {
+  getAllStudyPrograms,
+  importStudyPrograms,
+} from "../controllers/index.js";
 
-router.get('/all-studyprograms', hendleStudyProgramsController.getAllStudyPrograms);
+router.get("/all-studyprograms", getAllStudyPrograms);
+
+router.post("/import-studyprograms", importStudyPrograms);
 
 export default router;
 // Path: src/routes/RoutesStudyprogram.js

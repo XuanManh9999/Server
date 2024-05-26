@@ -1,7 +1,6 @@
 // import data
-
 const fake = {
-  nameStudyPrograms: "NGÀNH CÔNG NGHỆ THÔNG TIN",
+  NameStudyPrograms: "NGÀNH CÔNG NGHỆ THÔNG TIN",
   Key: 12,
   CodeStudyProgram: "7480201",
   EducationalLevel: "Đại Học",
@@ -13,6 +12,7 @@ const fake = {
   GradingScale: 4,
   GraduationRequirements: "Theo quy chế đào tạo của trường)",
   Extend: "Sau đại học (Thạc sỹ, Tiến sỹ)",
+  IDFaculty: 53,
   Equivalent: [
     "Chương trình đào tạo ngành CNTT, Đại học Điện Lực; ",
     "Chương trình đào tạo ngành CNTT, Đại học Đại Nam.",
@@ -92,5 +92,3 @@ const fake = {
     },
   ],
 };
-
-

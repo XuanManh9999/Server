@@ -9,7 +9,7 @@ import {
 export const addFaculty = async (req, res) => {
   try {
     const { facultyName, founding, desc, email, phoneNumber } = req.body;
-    if (!facultyName || !founding || !desc || !email || !phoneNumber) {
+    if (!facultyName || !founding || !email || !phoneNumber) {
       return res.status(400).json({
         status: 400,
         message: "All fields are required",
@@ -30,14 +30,7 @@ export const updateFaculty = async (req, res) => {
   try {
     const { facultyName, founding, desc, email, phoneNumber, idFaculty } =
       req.body;
-    if (
-      !facultyName ||
-      !founding ||
-      !desc ||
-      !email ||
-      !phoneNumber ||
-      !idFaculty
-    ) {
+    if (!facultyName || !founding || !email || !phoneNumber || !idFaculty) {
       return res.status(400).json({
         status: 400,
         message: "All fields are required",
