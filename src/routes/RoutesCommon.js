@@ -5,6 +5,7 @@ import {
   selectFaculty,
   selectClassByFacultyAndKey,
   selectSemesterByKey,
+  selectCourseByFacultyAndSemester,
 } from "../controllers/index.js";
 const router = express.Router();
 // Lấy khoa theo khóa
@@ -18,5 +19,11 @@ router.get("/select-class-by-faculty-and-key", selectClassByFacultyAndKey);
 
 // Lấy kỳ học theo khóa
 router.get("/select-semester-by-key", selectSemesterByKey);
+
+// Lấy các môn học theo khoa, khoa, ky
+router.get(
+  "/select-courses-by-faculty-and-semester-and-key",
+  selectCourseByFacultyAndSemester
+);
 
 export default router;

@@ -136,12 +136,12 @@ export const handleSelectSemesterByKey = (key) =>
     try {
       const timeNow = new Date();
       const yearNow = timeNow.getFullYear();
-      const monthNow = timeNow.getMonth() + 1;
+      const monthNow = timeNow.getMonth() + 5;
       const namHoc = Number(yearNow) - Number(process.env.START_YEAR) - 1 - key;
       const { nam, kyThucTe } = handleKi(namHoc, monthNow);
       const listKy = [];
       for (let i = 1; i <= kyThucTe; i++) {
-        listKy.push(i);
+        if (i <= 12) listKy.push(i);
       }
       resolve({
         status: 200,
@@ -153,6 +153,33 @@ export const handleSelectSemesterByKey = (key) =>
       });
     } catch (err) {
       console.log(err);
+      reject(err);
+    }
+  });
+
+export const handleSelectCourseByFacultyAndSemester = (
+  IDFaculty,
+  Key,
+  Semester
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        `SELECT * from course WHERE Semester = ?
+         and course.ID in 
+         (SELECT course_studyprogram.IDCourse FROM 
+          course_studyprogram where course_studyprogram.IDStudyProgram in (
+          SELECT studyprogram.ID from studyprogram WHERE studyprogram.Key = ? 
+          and studyprogram.IdFaculty = ?
+        ))`,
+        [Semester, Key, IDFaculty]
+      );
+      resolve({
+        status: result.length > 0 ? 200 : 400,
+        message: result.length > 0 ? "Success" : "Not Found",
+        data: result,
+      });
+    } catch (err) {
       reject(err);
     }
   });
