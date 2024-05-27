@@ -102,26 +102,59 @@ export const heandleSelectClassByIdFaculty = ({ IDFaculty }) =>
     }
   });
 
-export const handleDataClass = (dataClass) =>
+export const handleDataClass = (data) =>
   new Promise(async (resolve, reject) => {
+    let IDFaculty;
+    let connect;
     try {
-      for (let i = 0; i < dataClass.length; i++) {
-        const [check] = await connection.execute(
-          "SELECT * FROM class WHERE NameClass = ? AND IDFaculty = ?",
-          [dataClass[i].NameClass, dataClass[i].IDFaculty]
+      connect = await connection.getConnection();
+      if (!connect) {
+        throw new Error("Connection is undefined or null.");
+      }
+      await connect.beginTransaction();
+
+      for (let i = 0; i < data?.length; i++) {
+        // check faculty
+        const [checkFaculty] = await connect.execute(
+          "SELECT * from faculty WHERE FacultyName = ?",
+          [data[i]?.title ?? ""]
         );
-        if (check.length === 0) {
-          await connection.execute(
-            `INSERT INTO class (NameClass, IDFaculty) VALUES (?, ?)`,
-            [dataClass[i].NameClass, dataClass[i].IDFaculty]
+        IDFaculty = checkFaculty[0]?.ID ? checkFaculty[0]?.ID : null;
+        if (!IDFaculty) {
+          // them khoa
+          const [resultFaculty] = await connect.execute(
+            `INSERT INTO faculty (FacultyName) VALUES (?)`,
+            [data[i]?.title]
           );
+          IDFaculty = resultFaculty.insertId;
+        }
+
+        const dataClass = data[i]?.dataClass;
+
+        // loop
+        for (let i = 0; i < dataClass?.length; i++) {
+          // check class
+          const [checkClass] = await connect.execute(
+            "SELECT * FROM class WHERE NameClass = ? AND IDFaculty = ?",
+            [dataClass[i], IDFaculty]
+          );
+          if (checkClass.length === 0) {
+            await connect.execute(
+              `INSERT INTO class (NameClass, IDFaculty) VALUES (?, ?)`,
+              [dataClass[i], IDFaculty]
+            );
+          }
         }
       }
+      await connect.commit();
       resolve({
         status: 200,
         message: "Import Class Success",
       });
     } catch (err) {
+      if (connect) {
+        await connect.rollback();
+      }
       reject(err);
     }
   });

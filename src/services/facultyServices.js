@@ -61,43 +61,55 @@ export const handleDeleteFaculty = async (idFaculty) => {
 };
 export const handleImportFaculty = (listFaculty) =>
   new Promise(async (resolve, reject) => {
+    let connect;
+    let IDFaculty;
     try {
+      connect = await connection.getConnection();
+      if (!connect) {
+        throw new Error("Connection is undefined or null.");
+      }
+      await connect.beginTransaction();
       for (let i = 0; i < listFaculty.length; i++) {
-        const [result] = await connection.execute(
-          "SELECT * FROM faculty WHERE FacultyName = ?",
-          [listFaculty[i]?.facultyName]
-        );
-        if (result.length === 0) {
-          await connection.execute(
-            "INSERT INTO faculty (FacultyName, Founding, `Describe`, Email, PhoneNumber) VALUES (?, ?, ?, ?, ?)",
-            [
-              listFaculty[i]?.facultyName,
-              listFaculty[i]?.founding,
-              listFaculty[i]?.desc,
-              listFaculty[i]?.email,
-              listFaculty[i]?.phoneNumber,
-            ]
+        // Destructuring data from listFaculty
+        const { FacultyName, Founding, Describe, Email, PhoneNumber } =
+          listFaculty[i];
+        // check if FacultyName already exists in the database
+        if (FacultyName) {
+          const [result] = await connect.execute(
+            "SELECT ID FROM faculty WHERE FacultyName = ?",
+            [FacultyName]
           );
+          IDFaculty = result[0]?.ID ? result[0]?.ID : null;
         } else {
-          // Update Faculty
-          await connection.execute(
-            "UPDATE faculty SET FacultyName = ?, Founding = ?, `Describe` = ?, Email = ?, PhoneNumber = ? WHERE ID = ?",
-            [
-              listFaculty[i]?.facultyName,
-              listFaculty[i]?.founding,
-              listFaculty[i]?.desc,
-              listFaculty[i]?.email,
-              listFaculty[i]?.phoneNumber,
-              result[0]?.ID,
-            ]
-          );
+          continue;
+        }
+        if (IDFaculty) {
+          // validate
+          if (Founding && Email && PhoneNumber) {
+            await connect.execute(
+              "UPDATE faculty SET Founding = ?, `Describe` = ?, Email = ?, PhoneNumber = ? WHERE FacultyName = ?",
+              [Founding, Describe, Email, PhoneNumber, FacultyName]
+            );
+          }
+        } else {
+          // validate
+          if (Founding && Email && PhoneNumber) {
+            await connect.execute(
+              "INSERT INTO faculty (FacultyName, Founding, `Describe`, Email, PhoneNumber) VALUES (?, ?, ?, ?, ?)",
+              [FacultyName, Founding, Describe, Email, PhoneNumber]
+            );
+          }
         }
       }
+      await connect.commit();
       resolve({
         status: 200,
         message: "Success Import Faculty",
       });
     } catch (err) {
+      if (connect) {
+        await connect.rollback();
+      }
       reject(err);
     }
   });
