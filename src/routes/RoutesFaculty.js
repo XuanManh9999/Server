@@ -6,6 +6,7 @@ import {
   importFaculty,
   selectFaculty,
   selectAllFaculty,
+  countFaculty,
 } from "../controllers/index.js";
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.get("/select-all-faculty", selectAllFaculty);
 router.get("/select-faculty", selectFaculty);
 router.post("/add", addFaculty);
 router.put("/update", updateFaculty);
-router.delete("/delete/:idFaculty", deleteFaculty);
+router.get("/count-faculty", countFaculty);
+router.delete("/delete/:IDFaculty", deleteFaculty);
 
 export default router;

@@ -158,3 +158,19 @@ export const handleDataClass = (data) =>
       reject(err);
     }
   });
+
+export const heandleCountClass = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT count(NameClass) AS totalClass from class"
+      );
+      resolve({
+        status: 200,
+        message: "Count Class Success",
+        data: result[0],
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });

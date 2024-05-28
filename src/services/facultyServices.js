@@ -129,3 +129,19 @@ export const handleSelectAllFaculty = () =>
       reject(err);
     }
   });
+
+export const handleCountFaculty = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT COUNT(ID) as TotalFaculty FROM faculty"
+      );
+      resolve({
+        status: 200,
+        message: "Success Count Faculty",
+        data: result[0],
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });

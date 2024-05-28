@@ -4,6 +4,7 @@ import {
   heandleDeleteClass,
   heandleSelectClassByIdFaculty,
   handleDataClass,
+  heandleCountClass,
 } from "../services/index.js";
 
 export const createClass = async (req, res) => {
@@ -108,6 +109,18 @@ export const importClass = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An Error From Server With API importClass",
+    });
+  }
+};
+
+export const countClass = async (_, res) => {
+  try {
+    const response = await heandleCountClass();
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An Error From Server With API countClass",
     });
   }
 };

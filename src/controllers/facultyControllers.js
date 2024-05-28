@@ -4,6 +4,7 @@ import {
   handleDeleteFaculty,
   handleImportFaculty,
   handleSelectAllFaculty,
+  handleCountFaculty,
 } from "../services/index.js";
 
 export const addFaculty = async (req, res) => {
@@ -49,14 +50,14 @@ export const updateFaculty = async (req, res) => {
 
 export const deleteFaculty = async (req, res) => {
   try {
-    const { idFaculty } = req.params;
-    if (!idFaculty) {
+    const { IDFaculty } = req.params;
+    if (!IDFaculty) {
       return res.status(400).json({
         status: 400,
         message: "All fields are required",
       });
     } else {
-      const response = await handleDeleteFaculty(idFaculty);
+      const response = await handleDeleteFaculty(IDFaculty);
       return res.status(200).json(response);
     }
   } catch (error) {
@@ -95,6 +96,18 @@ export const selectAllFaculty = async (_, res) => {
     return res.status(500).json({
       status: 500,
       message: "An Error From Server With API selectAllFaculty",
+    });
+  }
+};
+
+export const countFaculty = async (_, res) => {
+  try {
+    const response = await handleCountFaculty();
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An Error From Server With API countFaculty",
     });
   }
 };
