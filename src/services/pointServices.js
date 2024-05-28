@@ -224,9 +224,7 @@ const importPoint = ({
         message: "Import dữ liệu thành công",
       });
     } catch (err) {
-      if (connect) {
-        await connect.rollback();
-      }
+      await connect.rollback();
       reject(err);
     }
   });

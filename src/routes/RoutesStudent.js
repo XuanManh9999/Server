@@ -1,6 +1,7 @@
 import express from "express";
-import * as hendleStudent from "../controllers/studentsControllers.js";
-
+import { importStudent } from "../controllers/index.js";
 const router = express.Router();
+
+router.post("/import-student", importStudent);
 
 export default router;
