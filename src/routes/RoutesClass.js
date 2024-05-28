@@ -15,6 +15,6 @@ router.post("/add-class-by-faculty", createClass);
 router.get("/select-class-by-faculty", selectClassByIdFaculty);
 router.get("/count-class", countClass);
 router.put("/update-class", updateClass);
-router.delete("/delete-class-by-id/:idClass", deleteClass);
+router.delete("/delete-class-by-id/:IDClass", deleteClass);
 
 export default router;
