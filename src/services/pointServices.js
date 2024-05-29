@@ -185,7 +185,7 @@ const importPoint = ({
             [idStudent, idCourse]
           );
 
-          if (checkPoint.length > 0) {
+          if (checkPoint?.length > 0) {
             await connect.execute(
               "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ? where IDUser = ? and IDCourse = ?",
               [
@@ -201,20 +201,22 @@ const importPoint = ({
               ]
             );
           } else {
-            await connect.execute(
-              "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-              [
-                +DataPoint[i]?.Frequent.toFixed(2),
-                +DataPoint[i]?.MidtermScore.toFixed(2),
-                +DataPoint[i]?.FinalExamScore.toFixed(2),
-                (+DataPoint[i]?.AverageScore).toFixed(2),
-                DataPoint[i]?.Scores,
-                DataPoint[i]?.LetterGrades,
-                DataPoint[i]?.Note,
-                idStudent,
-                idCourse,
-              ]
-            );
+            if (DataPoint[i]) {
+              await connect.execute(
+                "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [
+                  +DataPoint[i]?.Frequent.toFixed(2),
+                  +DataPoint[i]?.MidtermScore.toFixed(2),
+                  +DataPoint[i]?.FinalExamScore.toFixed(2),
+                  (+DataPoint[i]?.AverageScore).toFixed(2),
+                  DataPoint[i]?.Scores,
+                  DataPoint[i]?.LetterGrades,
+                  DataPoint[i]?.Note,
+                  idStudent,
+                  idCourse,
+                ]
+              );
+            }
           }
         }
       }
@@ -339,24 +341,41 @@ const HandleSelectPointStudents = (
   new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        `SELECT DISTINCT user.Msv, user.FullName, 
-        user.Gender, point.Frequent, point.MidtermScore, 
-        point.FinalExamScore, point.AverageScore, point.Scores, 
-        point.LetterGrades, point.Note, point.ExcludingTBC, course.Semester FROM user INNER JOIN userinrole
-        ON user.ID = userinrole.UserID INNER JOIN role ON userinrole.RoleID = 
-        role.ID AND role.ID = 3 INNER JOIN class on class.ID = user.IDClass and
-        IDClass = ? INNER JOIN faculty on faculty.ID = ? INNER JOIN studyprogram on 
-        studyprogram.IdFaculty = ? and studyprogram.Key = ? INNER JOIN course_studyprogram
-        on course_studyprogram.IDStudyProgram = studyprogram.ID INNER JOIN course on course.ID = 
-        course_studyprogram.IDCourse and course.ID = ? and course.Semester = ? 
-        INNER JOIN user_course on user_course.IDCourse = course.ID and user_course.IDUser = user.ID 
-        INNER JOIN point on point.IDCourse = course.ID GROUP BY user.Msv`,
-        [IDClass, IDFaculty, IDFaculty, Key, IDCourse, Semester]
+        `WITH UniquePoints AS (
+          SELECT DISTINCT point.IDUser, point.Frequent, point.MidtermScore, 
+                          point.FinalExamScore, point.AverageScore, 
+                          point.Scores, point.LetterGrades, 
+                          point.Note, point.ExcludingTBC, 
+                          course.Semester 
+          FROM point 
+          INNER JOIN course ON point.IDCourse = course.ID
+          WHERE course.ID = ? AND course.Semester = ?
+      )
+      SELECT DISTINCT user.Msv, user.FullName, user.Gender, 
+                      up.Frequent, up.MidtermScore, up.FinalExamScore, 
+                      up.AverageScore, up.Scores, 
+                      up.LetterGrades, up.Note, up.ExcludingTBC, 
+                      up.Semester
+      FROM user 
+      INNER JOIN userinrole ON user.ID = userinrole.UserID 
+      INNER JOIN role ON userinrole.RoleID = role.ID AND role.ID = 3 
+      INNER JOIN class ON class.ID = user.IDClass AND class.ID = ? 
+      INNER JOIN faculty ON faculty.ID = ?
+      INNER JOIN studyprogram ON studyprogram.IdFaculty = faculty.ID AND studyprogram.Key = ? 
+      INNER JOIN course_studyprogram ON course_studyprogram.IDStudyProgram = studyprogram.ID 
+      INNER JOIN course ON course.ID = course_studyprogram.IDCourse AND course.ID = ? AND course.Semester = ?
+      INNER JOIN user_course ON user_course.IDCourse = course.ID AND user_course.IDUser = user.ID 
+      INNER JOIN UniquePoints up ON up.IDUser = user.ID
+       `,
+        [IDCourse, Semester, IDClass, IDFaculty, Key, IDCourse, Semester]
       );
+
       resolve({
         status: result?.length > 0 ? 200 : 204,
         message:
-          result?.length > 0 ? "Get Data Point Students Done" : "Data Empty",
+        result?.length > 0
+            ? "Get Data Point Students Done"
+            : "Data Empty",
         data: result,
       });
     } catch (err) {

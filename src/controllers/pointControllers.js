@@ -13,17 +13,6 @@ const importPoint = async (req, res) => {
       DataStudents,
       DataPoint,
     } = req.body;
-    console.log(
-      Course,
-      Class,
-      Teacher,
-      Faculty,
-      TotalHours,
-      NumberOfCredits,
-      FinalExamDate,
-      DataStudents,
-      DataPoint
-    );
     if (
       Course &&
       Teacher &&
