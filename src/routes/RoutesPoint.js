@@ -15,4 +15,8 @@ router.get(
   hendlePoint.selectPointClass
 );
 
+
+// -- GET DIEM
+router.get('/select-point-students', hendlePoint.selectPointStudents);
+
 export default router;

@@ -39,6 +39,8 @@ const importPoint = ({
         );
         idFaculty = result.insertId;
       }
+      {
+      }
       // check class
       const [dataClass] = await connect.execute(
         "select ID from class where NameClass = ?",
@@ -75,11 +77,11 @@ const importPoint = ({
 
       // check course
       const [dataCourse] = await connect.execute(
-        "select  ID from course where NameCourse = ?",
+        "select DISTINCT ID from course where NameCourse = ?",
         [Course]
       );
 
-      idCourse = dataCourse?.length > 0 ? dataCourse[0].ID : null; // Update index here
+      idCourse = dataCourse.length > 0 ? dataCourse[0].ID : null; // Update index here
       if (idCourse === null) {
         // thêm course
         const [result] = await connect.execute(
@@ -124,6 +126,7 @@ const importPoint = ({
       ) {
         for (var i = 0; i < DataStudents.length; i++) {
           let idStudent;
+          // check user xem đã có student đó chưa?
           const [checkStudent] = await connect.execute(
             "SELECT DISTINCT user.ID, user.FullName from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.id = 3 and user.FullName = ?",
             [DataStudents[i]?.FullName]
@@ -326,9 +329,45 @@ const selectPointClass = ({ IdFaculty, IdClass, IdCourse }) => {
   });
 };
 
+const HandleSelectPointStudents = (
+  Key,
+  IDFaculty,
+  IDClass,
+  IDCourse,
+  Semester
+) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        `SELECT DISTINCT user.Msv, user.FullName, 
+        user.Gender, point.Frequent, point.MidtermScore, 
+        point.FinalExamScore, point.AverageScore, point.Scores, 
+        point.LetterGrades, point.ScoreScale10, point.ScoreScale4, 
+        point.ExcludingTBC, course.Semester FROM user INNER JOIN userinrole
+        ON user.ID = userinrole.UserID INNER JOIN role ON userinrole.RoleID = 
+        role.ID AND role.ID = 3 INNER JOIN class on class.ID = user.IDClass and
+        IDClass = ? INNER JOIN faculty on faculty.ID = ? INNER JOIN studyprogram on 
+        studyprogram.IdFaculty = ? and studyprogram.Key = ? INNER JOIN course_studyprogram
+        on course_studyprogram.IDStudyProgram = studyprogram.ID INNER JOIN course on course.ID = 
+        course_studyprogram.IDCourse and course.ID = ? and course.Semester = ? INNER JOIN point on 
+        point.IDCourse = course.ID GROUP BY user.Msv`,
+        [IDClass, IDFaculty, IDFaculty, Key, IDCourse, Semester]
+      );
+      resolve({
+        status: result?.length > 0 ? 200 : 204,
+        message:
+          result?.length > 0 ? "Get Data Point Students Done" : "Data Empty",
+        data: result,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
 export {
   importPoint,
   selectClassByID,
   selectCourseByIdClass,
   selectPointClass,
+  HandleSelectPointStudents,
 };

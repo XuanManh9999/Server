@@ -109,9 +109,38 @@ const selectPointClass = async (req, res) => {
   }
 };
 
+const selectPointStudents = async (req, res) => {
+  try {
+    const { Key, IDFaculty, IDClass, IDCourse, Semester } = req.query;
+    // check
+    if (Key && IDFaculty && IDClass && IDCourse && Semester) {
+      const response = await hendlePoint.HandleSelectPointStudents(
+        Key,
+        IDFaculty,
+        IDClass,
+        IDCourse,
+        Semester
+      );
+      return res.status(200).json(response);
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message:
+          "Please transmit enough data to be able to retrieve the data withAPI selectPointStudents",
+      });
+    }
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An Error from selectPointStudents",
+    });
+  }
+};
+
 export {
   importPoint,
   selectClassByID,
   selectCourseByIdClass,
   selectPointClass,
+  selectPointStudents,
 };
