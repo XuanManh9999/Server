@@ -4,7 +4,7 @@ import { pool as connection } from "../config/db.js";
 const importPoint = ({
   Course,
   Teacher,
-  Faculity,
+  Faculty,
   TotalHours,
   NumberOfCredits,
   FinalExamDate,
@@ -28,14 +28,14 @@ const importPoint = ({
       // check khoa
       const [dataFaculty] = await connect.execute(
         "select DISTINCT ID from faculty where FacultyName = ?",
-        [Faculity]
+        [Faculty]
       );
       idFaculty = dataFaculty.length > 0 ? dataFaculty[0].ID : null; // Update index here
       if (idFaculty === null) {
         // them khoa
         const [result] = await connect.execute(
           "insert into faculty (FacultyName) values (?)",
-          [Faculity]
+          [Faculty]
         );
         idFaculty = result.insertId;
       }
@@ -112,10 +112,10 @@ const importPoint = ({
       );
       // create class_course
       if (!dataCourseClass.length > 0) {
-        await connect.execute("insert into class_course values (?, ?)", [
-          idCourse,
-          idClass,
-        ]);
+        await connect.execute(
+          "insert into class_course (IDCourse, IDClass) values (?, ?)",
+          [idCourse, idClass]
+        );
       }
 
       if (
@@ -128,8 +128,8 @@ const importPoint = ({
           let idStudent;
           // check user xem đã có student đó chưa?
           const [checkStudent] = await connect.execute(
-            "SELECT DISTINCT user.ID, user.FullName from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.id = 3 and user.FullName = ?",
-            [DataStudents[i]?.FullName]
+            "SELECT DISTINCT user.ID, user.FullName from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.id = 3 and user.FullName = ? and user.Msv = ?",
+            [DataStudents[i]?.FullName, DataStudents[i]?.Msv]
           );
 
           idStudent = checkStudent.length > 0 ? checkStudent[0].ID : null; // Update index here
@@ -204,10 +204,10 @@ const importPoint = ({
             await connect.execute(
               "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
               [
-                DataPoint[i]?.Frequent,
-                DataPoint[i]?.MidtermScore,
-                DataPoint[i]?.FinalExamScore,
-                DataPoint[i]?.AverageScore,
+                +DataPoint[i]?.Frequent.toFixed(2),
+                +DataPoint[i]?.MidtermScore.toFixed(2),
+                +DataPoint[i]?.FinalExamScore.toFixed(2),
+                (+DataPoint[i]?.AverageScore).toFixed(2),
                 DataPoint[i]?.Scores,
                 DataPoint[i]?.LetterGrades,
                 DataPoint[i]?.Note,
@@ -342,15 +342,15 @@ const HandleSelectPointStudents = (
         `SELECT DISTINCT user.Msv, user.FullName, 
         user.Gender, point.Frequent, point.MidtermScore, 
         point.FinalExamScore, point.AverageScore, point.Scores, 
-        point.LetterGrades, point.ScoreScale10, point.ScoreScale4, 
-        point.ExcludingTBC, course.Semester FROM user INNER JOIN userinrole
+        point.LetterGrades, point.Note, point.ExcludingTBC, course.Semester FROM user INNER JOIN userinrole
         ON user.ID = userinrole.UserID INNER JOIN role ON userinrole.RoleID = 
         role.ID AND role.ID = 3 INNER JOIN class on class.ID = user.IDClass and
         IDClass = ? INNER JOIN faculty on faculty.ID = ? INNER JOIN studyprogram on 
         studyprogram.IdFaculty = ? and studyprogram.Key = ? INNER JOIN course_studyprogram
         on course_studyprogram.IDStudyProgram = studyprogram.ID INNER JOIN course on course.ID = 
-        course_studyprogram.IDCourse and course.ID = ? and course.Semester = ? INNER JOIN point on 
-        point.IDCourse = course.ID GROUP BY user.Msv`,
+        course_studyprogram.IDCourse and course.ID = ? and course.Semester = ? 
+        INNER JOIN user_course on user_course.IDCourse = course.ID and user_course.IDUser = user.ID 
+        INNER JOIN point on point.IDCourse = course.ID GROUP BY user.Msv`,
         [IDClass, IDFaculty, IDFaculty, Key, IDCourse, Semester]
       );
       resolve({

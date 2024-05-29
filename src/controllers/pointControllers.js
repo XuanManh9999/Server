@@ -6,23 +6,34 @@ const importPoint = async (req, res) => {
       Course,
       Class,
       Teacher,
-      Faculity,
+      Faculty,
       TotalHours,
       NumberOfCredits,
       FinalExamDate,
       DataStudents,
       DataPoint,
     } = req.body;
+    console.log(
+      Course,
+      Class,
+      Teacher,
+      Faculty,
+      TotalHours,
+      NumberOfCredits,
+      FinalExamDate,
+      DataStudents,
+      DataPoint
+    );
     if (
       Course &&
       Teacher &&
-      Faculity &&
+      Faculty &&
       TotalHours &&
+      Class &&
       NumberOfCredits &&
       FinalExamDate &&
       DataStudents &&
-      DataPoint &&
-      Class
+      DataPoint
     ) {
       const response = await hendlePoint.importPoint(req.body);
       return res.status(200).json(response);
