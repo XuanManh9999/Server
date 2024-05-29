@@ -116,7 +116,7 @@ export const handleDataClass = (data) =>
       for (let i = 0; i < data?.length; i++) {
         // check faculty
         const [checkFaculty] = await connect.execute(
-          "SELECT * from faculty WHERE FacultyName = ?",
+          "SELECT ID from faculty WHERE FacultyName = ?",
           [data[i]?.title ?? ""]
         );
         IDFaculty = checkFaculty[0]?.ID ? checkFaculty[0]?.ID : null;
@@ -139,10 +139,12 @@ export const handleDataClass = (data) =>
             [dataClass[i], IDFaculty]
           );
           if (checkClass.length === 0) {
-            await connect.execute(
-              `INSERT INTO class (NameClass, IDFaculty) VALUES (?, ?)`,
-              [dataClass[i], IDFaculty]
-            );
+            if (dataClass[i] !== "") {
+              await connect.execute(
+                `INSERT INTO class (NameClass, IDFaculty) VALUES (?, ?)`,
+                [dataClass[i], IDFaculty]
+              );
+            }
           }
         }
       }
@@ -152,6 +154,7 @@ export const handleDataClass = (data) =>
         message: "Import Class Success",
       });
     } catch (err) {
+      console.log(err);
       if (connect) {
         await connect.rollback();
       }
