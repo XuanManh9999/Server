@@ -75,11 +75,11 @@ const importPoint = ({
 
       // check course
       const [dataCourse] = await connect.execute(
-        "select DISTINCT ID from course where NameCourse = ?",
+        "select  ID from course where NameCourse = ?",
         [Course]
       );
 
-      idCourse = dataCourse.length > 0 ? dataCourse[0].ID : null; // Update index here
+      idCourse = dataCourse?.length > 0 ? dataCourse[0].ID : null; // Update index here
       if (idCourse === null) {
         // thêm course
         const [result] = await connect.execute(
@@ -124,7 +124,6 @@ const importPoint = ({
       ) {
         for (var i = 0; i < DataStudents.length; i++) {
           let idStudent;
-          // check user xem đã có student đó chưa?
           const [checkStudent] = await connect.execute(
             "SELECT DISTINCT user.ID, user.FullName from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.id = 3 and user.FullName = ?",
             [DataStudents[i]?.FullName]

@@ -68,11 +68,10 @@ export const handleImportStudent = (data) =>
             }
 
             // check student with MSV
-            const [student] = await connect.query(
-              `SELECT ID FROM user WHERE MSV = ?`,
-              [Msv || ""]
+            const [student] = await connect.execute(
+              `SELECT ID FROM user WHERE Msv = ?`,
+              [Msv]
             );
-
             IDStudent = student[0]?.ID;
             // neu co thi update, khong thi insert
             const key = tinhKhoa(Msv);
@@ -80,10 +79,11 @@ export const handleImportStudent = (data) =>
             const hashPassword = bcrypt.hashSync("123456@aA", salt);
             if (student.length === 0) {
               const [result] = await connect.execute(
-                `INSERT INTO user (FullName, UserName, Password, 
+                `INSERT INTO user (Msv, FullName, UserName, Password, 
                 Gender, EthnicGroup, DateOfBirth, Hometown, PermanentResidence, 
-                Email, PhoneNumber, ${Key}, status, IDClass) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                Email, PhoneNumber, ${Key}, status, IDClass) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
+                  Msv,
                   HoTen,
                   `${Msv}@eaut.edu.vn`,
                   hashPassword,
@@ -102,8 +102,9 @@ export const handleImportStudent = (data) =>
               IDStudent = result.insertId;
             } else {
               await connect.execute(
-                `UPDATE user SET FullName = ?, UserName = ?, Password = ?, Gender = ?, EthnicGroup = ?, DateOfBirth = ?, Hometown = ?, PermanentResidence = ?, Email = ?, PhoneNumber = ?, ${Key} = ?, status = ?, IDClass = ? WHERE ID = ?`,
+                `UPDATE user SET Msv = ?, FullName = ?, UserName = ?, Password = ?, Gender = ?, EthnicGroup = ?, DateOfBirth = ?, Hometown = ?, PermanentResidence = ?, Email = ?, PhoneNumber = ?, ${Key} = ?, status = ?, IDClass = ? WHERE ID = ?`,
                 [
+                  Msv,
                   HoTen,
                   `${Msv}@eaut.edu.vn`,
                   hashPassword,
