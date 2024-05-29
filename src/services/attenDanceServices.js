@@ -128,8 +128,7 @@ const importAttendance = ({
       }
       if (DataAttendance?.length > 0) {
         for (let i = 0; i < DataAttendance.length; i++) {
-          const { Msv, FullName, DateOfBirth, Comment, Attendance } =
-            DataAttendance[i];
+          const { Msv, FullName, DateOfBirth, Attendance } = DataAttendance[i];
           // check student
           const [student] = await connect.execute(
             "SELECT ID FROM user WHERE Msv = ?",
@@ -155,13 +154,37 @@ const importAttendance = ({
               "insert into user_course (IDUser, IDCourse) values (?, ?)",
               [idStudent, idCourse]
             );
+          } else {
+            // check quyen
+            const [checkRole] = await connect.execute(
+              "SELECT * FROM userinrole WHERE UserID = ? AND RoleID = 3",
+              [idStudent]
+            );
+            if (checkRole.length === 0) {
+              await connect.execute(
+                "insert into userinrole (UserID, RoleID) values (?, ?)",
+                [idStudent, 3]
+              );
+            }
+
+            // checl xem sinh vien da hoc mon hoc do chua
+            const [checkUser_course] = await connect.execute(
+              "SELECT * FROM user_course WHERE IDUser = ? AND IDCourse = ?",
+              [idStudent, idCourse]
+            );
+            if (checkUser_course.length === 0) {
+              await connect.execute(
+                "insert into user_course (IDUser, IDCourse) values (?, ?)",
+                [idStudent, idCourse]
+              );
+            }
           }
 
           // them diem danh
           if (Attendance?.length > 0) {
             for (let j = 0; j < Attendance.length; j++) {
-              const { Day, AttendanceStatus } = Attendance[j];
-              // check xem đã có sinh viên đó chưa?
+              const { Day, AttendanceStatus, Comment } = Attendance[j];
+              // check-xem-ngay-hom-do-da-diem-danh-chua
               const [existingRecord] = await connect.execute(
                 "SELECT ID FROM attendance WHERE IDStudent = ? AND Day = ? AND IDCourse = ?",
                 [idStudent, Day, idCourse]
@@ -169,7 +192,7 @@ const importAttendance = ({
 
               if (existingRecord?.length === 0) {
                 await connect.execute(
-                  "insert into attendance (Semester, SchoolYear, IDStudent, IDCourse, Day, AttendanceStatus) values (?, ?, ?, ?, ?, ?)",
+                  "insert into attendance (Semester, SchoolYear, IDStudent, IDCourse, Day, AttendanceStatus, Comment) values (?, ?, ?, ?, ?, ?, ?)",
                   [
                     Semester,
                     SchoolYear,
@@ -177,47 +200,24 @@ const importAttendance = ({
                     idCourse,
                     Day,
                     AttendanceStatus,
+                    Comment,
                   ]
                 );
               } else {
                 await connect.execute(
-                  "update attendance set Semester = ?, SchoolYear = ?, AttendanceStatus = ? where IDStudent = ? and Day = ? and IDCourse = ?",
+                  "update attendance set Semester = ?, SchoolYear = ?, AttendanceStatus = ? where IDStudent = ? and Day = ? and `Comment` = ? and IDCourse = ?",
                   [
                     Semester,
                     SchoolYear,
                     AttendanceStatus,
                     idStudent,
                     Day,
+                    Comment,
                     idCourse,
                   ]
                 );
               }
             }
-          }
-          // thêm comment
-          if (Comment) {
-            // cần update comment
-            // check comment
-            const [check] = await connect.execute(
-              "SELECT * FROM commentattendance WHERE IDStudent = ? AND IDCourse = ?",
-              [idStudent, idCourse]
-            );
-            if (!check.length) {
-              await connect.execute(
-                "insert into commentattendance (IDStudent, IDCourse, Comment) values (?, ?, ?)",
-                [idStudent, idCourse, Comment]
-              );
-            } else {
-              await connect.execute(
-                "update commentattendance set Comment = ? where IDStudent = ? and IDCourse = ?",
-                [Comment, idStudent, idCourse]
-              );
-            }
-          } else {
-            await connect.execute(
-              "insert into commentattendance (IDStudent, IDCourse, Comment) values (?, ?, ?)",
-              [idStudent, idCourse, ""]
-            );
           }
         }
       }
@@ -236,64 +236,43 @@ const importAttendance = ({
   });
 };
 
-const selectAttendance = (IdFaculty, IdClass, IdCourse) =>
+const selectAttendance = (IdFaculty, IdClass, IdCourse, Key, Semester) =>
   new Promise(async (resolve, reject) => {
-    let idStudent = [];
-    let listAttendance = [];
-    let listComment = [];
-    let data = {};
-
     try {
-      let [listStudent] = await connection.execute(
-        `SELECT DISTINCT faculty.FacultyName, class.NameClass, course.NameCourse, user.ID, user.Msv, user.FullName, user.DateOfBirth from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN faculty on faculty.ID = ? INNER JOIN class on class.IDFaculty = ? and class.ID = ? INNER JOIN user_course on user_course.IDUser = user.ID INNER JOIN course on course.ID = user_course.IDCourse and course.ID = ?`,
-        [IdFaculty, IdFaculty, IdClass, IdCourse]
+      const [result] = await connection.execute(
+        `
+      SELECT  user.Msv, user.FullName, user.DateOfBirth, attendance.AttendanceStatus, attendance.Comment 
+      FROM user 
+      INNER JOIN userinrole ON userinrole.UserID = user.ID 
+      INNER JOIN role ON role.ID = userinrole.RoleID AND role.ID = 3 
+      INNER JOIN class ON user.IDClass = class.ID AND class.ID = ? AND class.IDFaculty = ?
+      INNER JOIN faculty ON faculty.ID = ? 
+      INNER JOIN studyprogram ON studyprogram.Key = ? AND studyprogram.IdFaculty = ? 
+      INNER JOIN course_studyprogram ON studyprogram.ID = course_studyprogram.IDStudyProgram 
+      INNER JOIN course ON course.ID = course_studyprogram.IDCourse AND course.ID = ? AND course.Semester = ? 
+      INNER JOIN user_course ON user.ID = user_course.IDUser AND course.ID = user_course.IDCourse 
+      INNER JOIN attendance ON attendance.IDCourse = course.ID AND attendance.IDStudent = user.ID
+      WHERE class.ID = ? AND faculty.ID = ? AND studyprogram.Key = ? AND course.ID = ? AND course.Semester = ?;
+      `,
+        [
+          IdClass,
+          IdFaculty,
+          IdFaculty,
+          Key,
+          IdFaculty,
+          IdCourse,
+          Semester,
+          IdClass,
+          IdFaculty,
+          Key,
+          IdCourse,
+          Semester,
+        ]
       );
-
-      // getIDStudent
-      for (let i = 0; i < listStudent.length; i++) {
-        idStudent.push(listStudent[i].ID);
-      }
-      // lấy thông tin điểm danh
-
-      for (let i = 0; i < idStudent.length; i++) {
-        const [resultAttendance] = await connection.execute(
-          `SELECT  attendance.SchoolYear, attendance.Semester,  attendance.AttendanceStatus, attendance.Day FROM attendance WHERE IDStudent = ? and IDCourse = ?`,
-          [idStudent[i], IdCourse]
-        );
-        const [resultComment] = await connection.execute(
-          `SELECT commentattendance.Comment FROM commentattendance WHERE IDStudent = ? and IDCourse = ?`,
-          [idStudent[i], IdCourse]
-        );
-        listAttendance.push(resultAttendance);
-        listComment.push(resultComment[0]);
-      }
-
-      // gom dữ liệu lại
-      if (idStudent?.length > 0) {
-        data = {
-          Faculty: listStudent[0].FacultyName,
-          Class: listStudent[0].NameClass,
-          Course: listStudent[0].NameCourse,
-          DataAttendance: [],
-        };
-      }
-
-      if (listAttendance.length > 0) {
-        for (let i = 0; i < listAttendance.length; i++) {
-          let temp = {
-            Msv: listStudent[i].Msv,
-            FullName: listStudent[i].FullName,
-            DateOfBirth: listStudent[i].DateOfBirth,
-            Comment: listComment[i]?.Comment ?? "",
-            Attendance: listAttendance[i],
-          };
-          data.DataAttendance.push(temp);
-        }
-      }
       resolve({
-        status: 200,
-        message: "Lấy dữ liệu điểm danh thành công",
-        data: data,
+        status: result?.length > 0 ? 200 : 404,
+        message: result?.length > 0 ? "Get data done" : "Data is empty",
+        data: result,
       });
     } catch (err) {
       reject(err);

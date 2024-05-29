@@ -42,7 +42,7 @@ const fakeJSON =  {
       "Attendance": [
         {
           "Day": "2021-10-01",
-          "AttendanceStatus": "2"
+          "AttendanceStatus": "2" 
         },
         {
           "Day": "2022-10-01",

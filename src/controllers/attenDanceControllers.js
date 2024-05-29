@@ -72,18 +72,20 @@ const importAttendance = async (req, res) => {
 
 const selectAttendance = async (req, res) => {
   try {
-    const { IdFaculty, IdClass, IdCourse } = req.query;
-    if (IdFaculty && IdClass && IdCourse) {
+    const { IdFaculty, IdClass, IdCourse, Key, Semester } = req.query;
+    if ((IdFaculty, IdClass, IdCourse, Key, Semester)) {
       const respon = await hendleAttenDance.selectAttendance(
         IdFaculty,
         IdClass,
-        IdCourse
+        IdCourse,
+        Key,
+        Semester
       );
       return res.status(200).json(respon);
     } else {
       return res.status(400).json({
         status: 400,
-        message: "Data is not enough",
+        message: "Data is not enough to selectAttendance",
       });
     }
   } catch (err) {
