@@ -2,7 +2,29 @@
 const fake = {
   NameStudyPrograms: "NGÀNH CÔNG NGHỆ THÔNG TIN",
   Key: 12,
+  CodeStudyProgram: "7480201",
+  EducationalLevel: "Đại Học",
+  TypeOfEducation: "Chính Quy",
+  Diploma: "Kĩ sư",
+  LanguageOfInstruction: "Tiếng Việt",
+  CompletionTime: "4 năm (đủ 150 tín chỉ)",
+  CreditNumber: "150 (không bao gồm kiến thức GDTC, GDQP&AN)",
+  GradingScale: 4,
+  GraduationRequirements: "Theo quy chế đào tạo của trường)",
+  Extend: "Sau đại học (Thạc sỹ, Tiến sỹ)",
   IDFaculty: 53,
+  Equivalent: [
+    "Chương trình đào tạo ngành CNTT, Đại học Điện Lực; ",
+    "Chương trình đào tạo ngành CNTT, Đại học Đại Nam.",
+  ],
+  JobPosition: [
+    "-	Lập trình viên Phát triển phần mềm ",
+    "-	Kỹ sư phần mềm",
+    "-	Quản trị hệ thống mạng",
+    "-	Quản trị cơ sở dữ liệu",
+    "-	Chuyên viên bảo mật thông tin",
+    "-	Chuyên viên phân tích dữ liệu",
+  ],
   DataCourse: [
     {
       BlockKnowledge: "Kiến thức đại cương",

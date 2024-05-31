@@ -19,7 +19,6 @@ const getAllStudyPrograms = async (_, res) => {
 const importStudyPrograms = async (req, res) => {
   try {
     const { NameStudyPrograms, Key, IDFaculty, DataCourse } = req.body;
-    console.log(req.body);
     if (!NameStudyPrograms || !IDFaculty || !Key || !DataCourse) {
       return res.status(400).json({
         status: 400,
@@ -34,7 +33,7 @@ const importStudyPrograms = async (req, res) => {
         LanguageOfInstruction: "",
         CompletionTime: "",
         CreditNumber: "",
-        GradingScale: "",
+        GradingScale: 0,
         GraduationRequirements: "",
         Extend: "",
         Equivalent: [],

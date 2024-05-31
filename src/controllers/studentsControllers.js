@@ -28,8 +28,16 @@ export const allStudent = async (req, res) => {
   try {
     // Len Thong Nhat Nhau
     const { Key, IDFaculty, IDClass } = req.query;
-    const response = await handleAllStudent();
-    return res.status(200).json(response);
+    // validate
+    if (!Key || !IDFaculty || !IDClass) {
+      return res.status(400).json({
+        status: 400,
+        message: "Key, IDFaculty, IDClass is required from api allStudent",
+      });
+    } else {
+      const response = await handleAllStudent(Key, IDFaculty, IDClass);
+      return res.status(200).json(response);
+    }
   } catch {
     return res.status(500).json({
       status: 500,

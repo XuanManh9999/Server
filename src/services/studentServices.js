@@ -204,10 +204,35 @@ export const handleStudentById = (IDStudent) =>
       reject(err);
     }
   });
-export const handleAllStudent = () =>
-  new Promise((resolve, reject) => {
+export const handleAllStudent = (Key, IDFaculty, IDClass) =>
+  new Promise(async (resolve, reject) => {
     try {
-      
+      const data = [];
+      const [result] = await connection.execute(
+        `SELECT user.ID, user.Msv, user.FullName, user.Gender, user.Email, user.DateOfBirth, user.Key, user.status, user.PhoneNumber from user INNER JOIN userinrole on 
+        userinrole.UserID = user.ID INNER JOIN role on
+         role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN
+          faculty on faculty.ID = ?  WHERE user.IDClass = ? and user.Key = ?`,
+        [IDFaculty, IDClass, Key]
+      );
+
+      for (let i = 0; i < result?.length; i++) {
+        const student = {};
+        if (result[i]?.ID) {
+          console.log(result[i]?.ID);
+          const [relatives] = await connection.execute(
+            `SELECT * from relatives where relatives.studentId = ?`,
+            [result[i]?.ID]
+          );
+          student.student = result[i];
+          student.relatives = relatives;
+          data.push(student);
+        }
+      }
+      resolve({
+        status: 200,
+        data,
+      });
     } catch (err) {
       reject(err);
     }
