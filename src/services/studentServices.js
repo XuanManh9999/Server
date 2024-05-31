@@ -181,3 +181,34 @@ export const handleImportStudent = (data) =>
       reject(err);
     }
   });
+
+export const handleStudentById = (IDStudent) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const data = {};
+      const [student] = await connection.execute(
+        "SELECT  user.FullName, user.Gender, user.Email, user.DateOfBirth, user.Key, user.status, user.EthnicGroup, user.Hometown, user.PermanentResidence, user.PhoneNumber FROM user WHERE ID = ?",
+        [IDStudent]
+      );
+      data.student = student[0];
+      const [relatives] = await connection.execute(
+        "SELECT relatives.Name, relatives.Role, relatives.PhoneNumber FROM relatives WHERE studentid = ?",
+        [IDStudent]
+      );
+      data.relatives = relatives;
+      resolve({
+        status: 200,
+        data,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+export const handleAllStudent = () =>
+  new Promise((resolve, reject) => {
+    try {
+      
+    } catch (err) {
+      reject(err);
+    }
+  });

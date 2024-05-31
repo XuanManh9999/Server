@@ -200,6 +200,46 @@ const handleImportStudyPrograms = (data) =>
           [IDPrograms]
         );
 
+        //xoa tat ca class_course cua mon hoc cua chuong trinh
+        await connection.execute(
+          `DELETE FROM class_course WHERE IDCourse IN (
+            SELECT ID FROM course WHERE IDBlockKnowledge IN (
+              SELECT ID FROM blockknowledge WHERE IDStudyProgram = ?
+            )
+          )`,
+          [IDPrograms]
+        );
+
+        // delete user_course
+        await connection.execute(
+          `DELETE FROM user_course WHERE IDCourse IN (
+            SELECT ID FROM course WHERE IDBlockKnowledge IN (
+              SELECT ID FROM blockknowledge WHERE IDStudyProgram = ?
+            )
+          )`,
+          [IDPrograms]
+        );
+
+        // xoa point in course
+        await connection.execute(
+          `DELETE FROM point WHERE IDCourse IN (
+            SELECT ID FROM course WHERE IDBlockKnowledge IN (
+              SELECT ID FROM blockknowledge WHERE IDStudyProgram = ?
+            )
+          )`,
+          [IDPrograms]
+        );
+
+        // delete attendance neu co
+        await connection.execute(
+          `DELETE FROM attendance WHERE IDCourse IN (
+            SELECT ID FROM course WHERE IDBlockKnowledge IN (
+              SELECT ID FROM blockknowledge WHERE IDStudyProgram = ?
+            )
+          )`,
+          [IDPrograms]
+        );
+
         // xoa trong codecourseprerequisite
         await connection.execute(
           `DELETE FROM codecourseprerequisite WHERE IDCourse IN (
@@ -351,6 +391,7 @@ const handleImportStudyPrograms = (data) =>
         message: "Import dữ liệu thành công",
       });
     } catch (err) {
+      console.log(err);
       await connect.rollback();
 
       reject(err);

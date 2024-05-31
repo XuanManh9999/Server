@@ -184,15 +184,27 @@ const importPoint = ({
             "SELECT * from point where point.IDUser = ? and point.IDCourse = ?",
             [idStudent, idCourse]
           );
-
           if (checkPoint?.length > 0) {
+            console.log(
+              "update",
+              DataPoint[i]?.Frequent,
+              DataPoint[i]?.MidtermScore,
+              DataPoint[i]?.FinalExamScore,
+              DataPoint[i]?.AverangeScore,
+              DataPoint[i]?.Scores,
+              DataPoint[i]?.LetterGrades,
+              DataPoint[i]?.Note,
+              idStudent,
+              idCourse
+            );
+
             await connect.execute(
               "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ? where IDUser = ? and IDCourse = ?",
               [
                 DataPoint[i]?.Frequent,
                 DataPoint[i]?.MidtermScore,
                 DataPoint[i]?.FinalExamScore,
-                DataPoint[i]?.AverageScore,
+                DataPoint[i]?.AverangeScore,
                 DataPoint[i]?.Scores,
                 DataPoint[i]?.LetterGrades,
                 DataPoint[i]?.Note,
@@ -208,7 +220,7 @@ const importPoint = ({
                   +DataPoint[i]?.Frequent.toFixed(2),
                   +DataPoint[i]?.MidtermScore.toFixed(2),
                   +DataPoint[i]?.FinalExamScore.toFixed(2),
-                  (+DataPoint[i]?.AverageScore).toFixed(2),
+                  (+DataPoint[i]?.AverangeScore).toFixed(2),
                   DataPoint[i]?.Scores,
                   DataPoint[i]?.LetterGrades,
                   DataPoint[i]?.Note,
@@ -373,9 +385,7 @@ const HandleSelectPointStudents = (
       resolve({
         status: result?.length > 0 ? 200 : 204,
         message:
-        result?.length > 0
-            ? "Get Data Point Students Done"
-            : "Data Empty",
+          result?.length > 0 ? "Get Data Point Students Done" : "Data Empty",
         data: result,
       });
     } catch (err) {
