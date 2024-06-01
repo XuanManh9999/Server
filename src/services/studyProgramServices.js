@@ -43,7 +43,7 @@ const handleImportStudyPrograms = (data) =>
           `INSERT INTO studyprogram 
           (ProgramName, ${Key}, CodeStudyProgram,
             EducationalLevel, TypeOfEducation, Diploma, LanguageOfInstruction,
-            CompletionTime, CreditNumber, GradingScale, GraduationRequirements, Extend, idFaculty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            CompletionTime, CreditNumber, GradingScale, GraduationRequirements, Extend, idFaculty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             data?.NameStudyPrograms,
             data?.Key,
