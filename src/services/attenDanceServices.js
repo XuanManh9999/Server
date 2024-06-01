@@ -200,7 +200,7 @@ const importAttendance = ({
                     idCourse,
                     Day,
                     AttendanceStatus,
-                    Comment,
+                    Comment ?? "",
                   ]
                 );
               } else {

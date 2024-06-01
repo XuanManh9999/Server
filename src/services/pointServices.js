@@ -185,27 +185,14 @@ const importPoint = ({
             [idStudent, idCourse]
           );
           if (checkPoint?.length > 0) {
-            console.log(
-              "update",
-              DataPoint[i]?.Frequent,
-              DataPoint[i]?.MidtermScore,
-              DataPoint[i]?.FinalExamScore,
-              DataPoint[i]?.AverageScore,
-              DataPoint[i]?.Scores,
-              DataPoint[i]?.LetterGrades,
-              DataPoint[i]?.Note,
-              idStudent,
-              idCourse
-            );
-
             await connect.execute(
               "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ? where IDUser = ? and IDCourse = ?",
               [
-                DataPoint[i]?.Frequent,
-                DataPoint[i]?.MidtermScore,
-                DataPoint[i]?.FinalExamScore,
-                DataPoint[i]?.AverageScore,
-                DataPoint[i]?.Scores,
+                +DataPoint[i]?.Frequent?.toFixed(2) || -1,
+                +DataPoint[i]?.MidtermScore?.toFixed(2) || -1,
+                +DataPoint[i]?.FinalExamScore?.toFixed(2) || -1,
+                (+DataPoint[i]?.AverageScore)?.toFixed(2) || -1,
+                DataPoint[i]?.Scores?.toFixed(2) || -1,
                 DataPoint[i]?.LetterGrades,
                 DataPoint[i]?.Note,
                 idStudent,
@@ -217,11 +204,11 @@ const importPoint = ({
               await connect.execute(
                 "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [
-                  +DataPoint[i]?.Frequent.toFixed(2),
-                  +DataPoint[i]?.MidtermScore.toFixed(2),
-                  +DataPoint[i]?.FinalExamScore.toFixed(2),
-                  (+DataPoint[i]?.AverageScore).toFixed(2),
-                  DataPoint[i]?.Scores,
+                  +DataPoint[i]?.Frequent?.toFixed(2) || -1,
+                  +DataPoint[i]?.MidtermScore?.toFixed(2) || -1,
+                  +DataPoint[i]?.FinalExamScore?.toFixed(2) || -1,
+                  (+DataPoint[i]?.AverageScore)?.toFixed(2) || -1,
+                  DataPoint[i]?.Scores?.toFixed(2) || -1,
                   DataPoint[i]?.LetterGrades,
                   DataPoint[i]?.Note,
                   idStudent,
