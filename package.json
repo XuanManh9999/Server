@@ -21,7 +21,8 @@
         "jsonwebtoken": "^9.0.2",
         "lodash": "^4.17.21",
         "morgan": "~1.9.1",
-        "mysql2": "^3.6.3"
+        "mysql2": "^3.6.3",
+        "nodemailer": "^6.9.13"
     },
     "devDependencies": {
         "nodemon": "^3.0.1"

@@ -174,12 +174,6 @@ export const deleteWarning = async (req, res) => {
 
 export const sendWarning = async (req, res) => {
   try {
-    if (Object.keys(req.body)?.length === 0) {
-      return res.status(400).json({
-        status: 400,
-        message: "Please enter complete information to continue",
-      });
-    }
     const response = await handleSendWarning(req.body);
     return res.status(200).json(response);
   } catch {
