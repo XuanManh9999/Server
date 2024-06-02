@@ -208,6 +208,7 @@ export const handleAllStudent = (Key, IDFaculty, IDClass) =>
   new Promise(async (resolve, reject) => {
     try {
       const data = [];
+      // const list_point_false = [];
       const [result] = await connection.execute(
         `SELECT user.ID, user.Msv, user.FullName, user.Gender, user.Email, user.DateOfBirth, user.Key, user.status, user.PhoneNumber from user INNER JOIN userinrole on 
         userinrole.UserID = user.ID INNER JOIN role on
@@ -215,16 +216,35 @@ export const handleAllStudent = (Key, IDFaculty, IDClass) =>
           faculty on faculty.ID = ?  WHERE user.IDClass = ? and user.Key = ?`,
         [IDFaculty, IDClass, Key]
       );
-
       for (let i = 0; i < result?.length; i++) {
         const student = {};
+        let stcno = 0;
         if (result[i]?.ID) {
-          console.log(result[i]?.ID);
           const [relatives] = await connection.execute(
             `SELECT * from relatives where relatives.studentId = ?`,
             [result[i]?.ID]
           );
+          const [list_point_false] = await connection.execute(
+            `
+            SELECT point.IDCourse from point where point.IDUser 
+            = ? and point.AverageScore < 4 
+          `,
+            [result[i]?.ID]
+          );
+          for (let i = 0; i < list_point_false.length; i++) {
+            if (list_point_false[i]?.IDCourse) {
+              const [course] = await connection.execute(
+                `
+                SELECT course.NumberOfCredits as STC from course where course.ID = ?
+              `,
+                [list_point_false[i]?.IDCourse]
+              );
+              stcno += Number(course[0]?.STC);
+            }
+          }
+          // student.student.STCNO = stcno;
           student.student = result[i];
+          student.student = { ...student.student, STC_NO: stcno, NO_HP: 0 };
           student.relatives = relatives;
           data.push(student);
         }
