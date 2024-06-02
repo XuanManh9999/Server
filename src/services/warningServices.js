@@ -114,9 +114,10 @@ export const handleUpdateWarning = (
 export const handleDeleteWarning = (id) =>
   new Promise(async (resolve, reject) => {
     try {
-      const [result] = await connection.execute("DELETE FROM warnings WHERE ID = ?", [
-        id,
-      ]);
+      const [result] = await connection.execute(
+        "DELETE FROM warnings WHERE ID = ?",
+        [id]
+      );
       resolve({
         status: result.affectedRows === 0 ? 400 : 200,
         message:
@@ -124,6 +125,37 @@ export const handleDeleteWarning = (id) =>
             ? "Delete warning failed"
             : "Delete warning successfully",
       });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export const handleSendWarning = (condition) =>
+  new Promise(async (resolve, reject) => {
+    const { IDWarning, Key, IDFaculty, IDClass, IDUser, list_student } =
+      condition;
+    const dk = {};
+    try {
+      if (IDWarning) {
+        dk.IDWarning = IDWarning;
+      }
+      if (Key) {
+        dk.Key = Key;
+      }
+      if (IDFaculty) {
+        dk.IDFaculty = IDFaculty;
+      }
+      if (IDClass) {
+        dk.IDClass = IDClass;
+      }
+      if (IDUser) {
+        dk.IDUser = IDUser;
+      }
+      if (list_student) {
+        dk.list_student = list_student;
+      }
+      // Xử lý trường hợp truyền xuống mỗi IDWarning
+      
     } catch (err) {
       reject(err);
     }

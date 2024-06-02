@@ -1,11 +1,22 @@
+import jwt from "jsonwebtoken";
 import {
   handleSelectAllWarnings,
   handleSelectWarningByID,
   handleInsertWarning,
   handleUpdateWarning,
-  handleDeleteWarning
+  handleDeleteWarning,
+  handleSendWarning,
 } from "../services/index.js";
 
+const handleVerifyToken = (token) => {
+  return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      return false;
+    } else {
+      return user?.id;
+    }
+  });
+};
 export const selectAllWarnings = async (req, res) => {
   try {
     const response = await handleSelectAllWarnings();
@@ -40,6 +51,8 @@ export const selectWarningByID = async (req, res) => {
 
 export const insertWarning = async (req, res) => {
   try {
+    let token = req.headers.authorization.split(" ")[1];
+    let IDAuthor = await handleVerifyToken(token);
     const {
       NameWarning,
       SBN,
@@ -48,7 +61,6 @@ export const insertWarning = async (req, res) => {
       GPA,
       LevelWarning,
       ContentWarning,
-      Author,
     } = req.body;
 
     // validate
@@ -60,7 +72,7 @@ export const insertWarning = async (req, res) => {
       !GPA ||
       !LevelWarning ||
       !ContentWarning ||
-      !Author
+      !IDAuthor
     ) {
       return res.status(400).json({
         status: 400,
@@ -75,7 +87,7 @@ export const insertWarning = async (req, res) => {
         GPA,
         LevelWarning,
         ContentWarning,
-        Author
+        IDAuthor
       );
       return res.status(200).json(response);
     }
@@ -89,6 +101,8 @@ export const insertWarning = async (req, res) => {
 
 export const updateWarning = async (req, res) => {
   try {
+    let token = req.headers.authorization.split(" ")[1];
+    let IDAuthor = await handleVerifyToken(token);
     const {
       NameWarning,
       SBN,
@@ -97,7 +111,6 @@ export const updateWarning = async (req, res) => {
       GPA,
       LevelWarning,
       ContentWarning,
-      Author,
       IDWarning,
     } = req.body;
 
@@ -110,7 +123,7 @@ export const updateWarning = async (req, res) => {
       !GPA ||
       !LevelWarning ||
       !ContentWarning ||
-      !Author ||
+      !IDAuthor ||
       !IDWarning
     ) {
       return res.status(400).json({
@@ -126,7 +139,7 @@ export const updateWarning = async (req, res) => {
         GPA,
         LevelWarning,
         ContentWarning,
-        Author,
+        IDAuthor,
         IDWarning
       );
       return res.status(200).json(response);
@@ -155,6 +168,24 @@ export const deleteWarning = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An error deleteWarning on the server",
+    });
+  }
+};
+
+export const sendWarning = async (req, res) => {
+  try {
+    if (Object.keys(req.body)?.length === 0) {
+      return res.status(400).json({
+        status: 400,
+        message: "Please enter complete information to continue",
+      });
+    }
+    const response = await handleSendWarning(req.body);
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error sendAllWarningByID on the server",
     });
   }
 };

@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import {
   handleAddFaculty,
   handleUpdateFaculty,
@@ -88,7 +89,7 @@ export const importFaculty = async (req, res) => {
   }
 };
 
-export const selectAllFaculty = async (_, res) => {
+export const selectAllFaculty = async (req, res) => {
   try {
     const response = await handleSelectAllFaculty();
     return res.status(200).json(response);
