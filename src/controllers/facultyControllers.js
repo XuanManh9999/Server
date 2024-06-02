@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import {
   handleAddFaculty,
   handleUpdateFaculty,
