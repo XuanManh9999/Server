@@ -19,3 +19,5 @@ router.get("/count-faculty", countFaculty);
 router.delete("/delete/:IDFaculty", deleteFaculty);
 
 export default router;
+
+

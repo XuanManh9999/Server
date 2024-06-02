@@ -18,7 +18,6 @@ const UserLogin = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       status: 500,
       message: 'An error occurred on the server',
