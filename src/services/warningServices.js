@@ -130,10 +130,32 @@ export const handleDeleteWarning = (id) =>
     }
   });
 
+function handleDay(dbDateStr) {
+  // Chuyển đổi chuỗi ngày thành đối tượng Date
+  let dbDate = new Date(dbDateStr);
+
+  // Lấy ngày hiện tại
+  let currentDate = new Date();
+
+  // Tính toán sự chênh lệch giữa hai ngày bằng miliseconds
+  let diffInMs = currentDate - dbDate;
+
+  // Chuyển đổi sự chênh lệch từ milliseconds thành ngày
+  let diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  return diffInDays;
+}
+
 export const handleSendWarning = ({ list_id_warning }) =>
   new Promise(async (resolve, reject) => {
     const condition = [];
+    let connect;
     try {
+      connect = await connection.getConnection();
+      if (!connect) {
+        throw new Error("Connection is undefined or null.");
+      }
+      await connect.beginTransaction();
       if (list_id_warning && list_id_warning.length > 0) {
         for (let i = 0; i < list_id_warning.length; i++) {
           const [result] = await connection.execute(
@@ -146,35 +168,32 @@ export const handleSendWarning = ({ list_id_warning }) =>
         const [result] = await connection.execute(
           "SELECT warnings.ID, warnings.NameWarning, warnings.SBN, warnings.TTHP, warnings.STC_NO, warnings.GPA FROM warnings"
         );
-        condition = [...result];
+        condition.push(...result);
       }
       // tim sv trong
       for (let i = 0; i < condition.length; i++) {
         // distructuring
-        const { NameWarning, SBN, TTHP, STC_NO, GPA } = condition[i];
+        const { ID, NameWarning, SBN, TTHP, STC_NO, GPA } = condition[i];
         let list_sv_send_warning = new Set();
         // check sbn
         if (SBN) {
           // Quy định sẵn nếu nghỉ quá 2 buổi trong một môn học thì add vào list_sv_send_warning
           const [data_sbn] = await connection.execute(
-            `SELECT IDStudent FROM attendance WHERE AttendanceStatus = '3' GROUP BY IDStudent, IDCourse HAVING COUNT(IDStudent) >= 2;`
+            `SELECT IDStudent FROM attendance WHERE AttendanceStatus = '3' GROUP BY IDStudent, IDCourse HAVING COUNT(IDStudent) >= ?;`,
+            [SBN]
           );
-          list_sv_send_warning.add(data_sbn?.IDStudent);
+          for (let i = 0; i < data_sbn?.length; i++) {
+            list_sv_send_warning.add(data_sbn[i].IDStudent);
+          }
         }
         // check stc_no
         if (STC_NO) {
           const [data_stc_no] = await connection.execute(
-            "SELECT point.IDUser, point.AverageScore from point"
+            "SELECT point.IDUser, sum(course.NumberOfCredits) as stc_no from point INNER JOIN course on point.IDCourse = course.ID WHERE point.AverageScore < ? GROUP BY IDUser",
+            [STC_NO]
           );
-          // check diem neu < 4 thi add IDUser vao list_sv_send_warning
           for (let i = 0; i < data_stc_no.length; i++) {
-            if (
-              data_stc_no[i] &&
-              data_stc_no[i]?.AverageScore !== 0 &&
-              data_stc_no[i]?.AverageScore < 4
-            ) {
-              list_sv_send_warning.add(data_stc_no[i].IDUser);
-            }
+            list_sv_send_warning.add(data_stc_no[i]?.IDUser);
           }
         }
         // check dtb
@@ -183,9 +202,47 @@ export const handleSendWarning = ({ list_id_warning }) =>
             "SELECT point.IDUser, sum(point.AverageScore * course.NumberOfCredits), sum(course.NumberOfCredits) from point INNER JOIN course on point.IDCourse = course.ID GROUP BY point.IDUser HAVING (sum(point.AverageScore * course.NumberOfCredits) / sum(course.NumberOfCredits)) < ?",
             [GPA]
           );
+          // add IDUser vao list_sv_send_warning
+          for (let i = 0; i < data_gpa?.length; i++) {
+            list_sv_send_warning.add(data_gpa[i]?.IDUser);
+          }
         }
+        // check user_warning
+        for (let value of list_sv_send_warning) {
+          if (value && ID) {
+            const [check_user_warning] = await connection.execute(
+              "SELECT * from user_warning WHERE user_warning.IDUser = ?",
+              [value]
+            );
+            if (check_user_warning?.length > 0) {
+              // check date
+              let resultDate = handleDay(
+                check_user_warning[check_user_warning?.length - 1]?.CreateAt
+              );
+              if (Number(resultDate) >= 90) {
+                // create
+                await connection.execute(
+                  "INSERT INTO user_warning (IDUser, IDWarning) VALUES(?, ?)",
+                  [value, ID]
+                );
+              }
+            } else {
+              // create
+              await connection.execute(
+                "INSERT INTO user_warning (IDUser, IDWarning) VALUES(?, ?)",
+                [value, ID]
+              );
+            }
+          }
+        }
+        resolve({
+          OK: "OK",
+        });
       }
+      await connect.commit();
     } catch (err) {
+      await connect.rollback();
+      console.log(err);
       reject(err);
     }
   });
