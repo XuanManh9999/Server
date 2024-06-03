@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 const generateAcessToken = (data) => {
   const access_token = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1m",
+    expiresIn: "7d",
   });
   return access_token;
 };

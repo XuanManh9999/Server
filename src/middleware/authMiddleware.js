@@ -8,6 +8,7 @@ const authMiddlewareAdmin = (req, res, next) => {
       message: "Token is valid",
     });
   }
+  console.log(process.env.ACCESS_TOKEN_SECRET);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
     if (err) {
       return res.status(404).json({
@@ -15,8 +16,7 @@ const authMiddlewareAdmin = (req, res, next) => {
         message: "The user is not authenticated, maybe the token has expired ",
       });
     }
-
-    if (admin?.name === "Admin") {
+    if (admin?.role === "Admin") {
       req.admin = admin?.id;
       next();
     } else {
