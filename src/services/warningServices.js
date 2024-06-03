@@ -165,7 +165,6 @@ const handleSendEmailByUserID = (list_id_student, IDWarning) =>
 
       // join lai theo dinh dang 20210794@eaut.edu.vn,20210795@eaut.edu.vn
       const list_email_send = list_email.join(",");
-      console.log("XM CHECK list_email_send", list_email_send);
 
       const [warning] = await connection.execute(
         "select * from warnings where warnings.ID = ?",
@@ -292,7 +291,8 @@ export const handleSendWarning = ({ list_id_warning }) =>
       }
       await connect.commit();
       resolve({
-        OK: "OK",
+        status: "200",
+        message: "Send warning successfully",
       });
     } catch (err) {
       await connect.rollback();
