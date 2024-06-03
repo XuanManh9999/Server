@@ -74,7 +74,6 @@ const UserLogin = ({ Email, Password, res }) => {
           path: "/",
           sameSite: "strict",
         });
-        console.log("Xuan manh check roleUser", roleUser);
         resolve({
           status: 200,
           message: "OK",

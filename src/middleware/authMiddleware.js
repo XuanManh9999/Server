@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 // Admin
 const authMiddlewareAdmin = (req, res, next) => {
-  const { token } = req.headers;
+  let token = req.headers.authorization.split(" ")[1];
   if (!token) {
     return res.status(404).json({
       status: 404,
@@ -15,9 +15,9 @@ const authMiddlewareAdmin = (req, res, next) => {
         message: "The user is not authenticated, maybe the token has expired ",
       });
     }
-  
-    if (admin.role === "Admin") {
-      req.admin = user;
+
+    if (admin?.name === "Admin") {
+      req.admin = admin?.id;
       next();
     } else {
       return res.status(404).json({
@@ -29,7 +29,7 @@ const authMiddlewareAdmin = (req, res, next) => {
 };
 // Giảng viên JWT
 const authMiddlewareLecturers = (req, res, next) => {
-  const { token } = req.headers;
+  let token = req.headers.authorization.split(" ")[1];
   if (!token) {
     return res.status(404).json({
       status: 404,
@@ -43,7 +43,7 @@ const authMiddlewareLecturers = (req, res, next) => {
         message: "The user is not authenticated, maybe the token has expired ",
       });
     }
-    if (user.role === "Lecturers") {
+    if (user?.name === "Lecturers") {
       next();
     } else {
       return res.status(404).json({
@@ -56,7 +56,7 @@ const authMiddlewareLecturers = (req, res, next) => {
 
 // Người dùng JWT
 const authMiddlewareStudent = (req, res, next) => {
-  const { token } = req.headers;
+  let token = req.headers.authorization.split(" ")[1];
   if (!token) {
     return res.status(404).json({
       status: 404,
@@ -71,7 +71,7 @@ const authMiddlewareStudent = (req, res, next) => {
         message: "The user is not authenticated, maybe the token has expired ",
       });
     }
-    if (user.role === "User") {
+    if (user?.name === "User") {
       next();
     } else {
       return res.status(404).json({

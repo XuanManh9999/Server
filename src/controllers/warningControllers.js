@@ -8,15 +8,6 @@ import {
   handleSendWarning,
 } from "../services/index.js";
 
-const handleVerifyToken = (token) => {
-  return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) {
-      return false;
-    } else {
-      return user?.id;
-    }
-  });
-};
 export const selectAllWarnings = async (req, res) => {
   try {
     const response = await handleSelectAllWarnings();
@@ -51,8 +42,7 @@ export const selectWarningByID = async (req, res) => {
 
 export const insertWarning = async (req, res) => {
   try {
-    let token = req.headers.authorization.split(" ")[1];
-    let IDAuthor = await handleVerifyToken(token);
+    let IDAuthor = req.admin;
     const {
       NameWarning,
       SBN,
@@ -101,8 +91,7 @@ export const insertWarning = async (req, res) => {
 
 export const updateWarning = async (req, res) => {
   try {
-    let token = req.headers.authorization.split(" ")[1];
-    let IDAuthor = await handleVerifyToken(token);
+    let IDAuthor = req.admin;
     const {
       NameWarning,
       SBN,

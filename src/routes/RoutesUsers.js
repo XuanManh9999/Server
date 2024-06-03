@@ -1,24 +1,18 @@
 import express from "express";
-import * as userControllers from "../controllers/userControllers.js";
+import * as userController from "../controllers/userControllers.js";
 const router = express.Router();
-import {
-  authMiddlewareAdmin,
-  authMiddlewareLecturers,
-} from "../middleware/authMiddleware.js";
+
 // Common
-router.post("/register", userControllers.UserRegister);
-router.post("/login", userControllers.UserLogin);
-router.post("/forgot-password", userControllers.ForgotPassword);
+router.post("/register", userController.UserRegister);
+router.post("/login", userController.UserLogin);
+router.post("/forgot-password", userController.ForgotPassword);
 
 // lấy toàn bộ
-router.get("/users", userControllers.UserData);
+router.get("/users", userController.UserData);
 
 // Lấy theo ID
-router.get("/:id", userControllers.UserById);
+router.get("/:id", userController.UserById);
 
-
-router.post("/test", userControllers.hendleTest);
-
-
+router.post("/test", userController.hendleTest);
 
 export default router;

@@ -182,6 +182,7 @@ export const handleImportStudent = (data) =>
     }
   });
 
+  
 export const handleStudentById = (IDStudent) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -253,6 +254,14 @@ export const handleAllStudent = (Key, IDFaculty, IDClass) =>
         status: 200,
         data,
       });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export const handleWarningStudent = (IDStudent) =>
+  new Promise((resolve, reject) => {
+    try {
     } catch (err) {
       reject(err);
     }

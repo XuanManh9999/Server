@@ -2,6 +2,7 @@ import {
   handleImportStudent,
   handleStudentById,
   handleAllStudent,
+  handleWarningStudent,
 } from "../services/index.js";
 
 export const importStudent = async (req, res) => {
@@ -60,6 +61,25 @@ export const studentById = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An error from API studentById",
+    });
+  }
+};
+
+export const WarningStudent = async (req, res) => {
+  try {
+    const { IDStudent } = req.params;
+    if (!IDStudent) {
+      return res.status(400).json({
+        status: 400,
+        message: "IDStudent is required from api WarningStudent",
+      });
+    }
+    const response = await handleWarningStudent(IDStudent);
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error from API WarningStudent",
     });
   }
 };

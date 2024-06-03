@@ -21,5 +21,4 @@ function app(express) {
   express.use("/api/v1/student", routerStudent);
   express.use("/api/v1/warning", routerWarning);
 }
-
 export default app;
