@@ -182,7 +182,6 @@ export const handleImportStudent = (data) =>
     }
   });
 
-  
 export const handleStudentById = (IDStudent) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -259,10 +258,118 @@ export const handleAllStudent = (Key, IDFaculty, IDClass) =>
     }
   });
 
+function handleDay(dbDateStr) {
+  // Chuyển đổi chuỗi ngày thành đối tượng Date
+  let dbDate = new Date(dbDateStr);
+
+  // Lấy ngày hiện tại
+  let currentDate = new Date();
+
+  // Tính toán sự chênh lệch giữa hai ngày bằng miliseconds
+  let diffInMs = currentDate - dbDate;
+
+  // Chuyển đổi sự chênh lệch từ milliseconds thành ngày
+  let diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  return diffInDays;
+}
+
 export const handleWarningStudent = (IDStudent) =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
+    const dataWarning = {};
     try {
+      // check xem user co data trong canh bao do khong
+      const [data] = await connection.execute(
+        "SELECT * from user_warning WHERE user_warning.IDUser = ?",
+        [IDStudent]
+      );
+      if (data?.length > 0) {
+        // lay warning
+        const [warning] = await connection.execute(
+          "SELECT * from warnings where warnings.ID = ?",
+          [data[data.length - 1]?.IDWarning]
+        );
+        const { NameWarning, SBN, TTHP, STC_NO, GPA, LevelWarning } =
+          warning[0];
+
+        // find data cua user do
+        dataWarning.NameWarning = NameWarning;
+        dataWarning.LevelWarning = LevelWarning;
+        dataWarning.TTHP = "Chưa có thông tin";
+        if (SBN) {
+          const [data_di_muon] = await connection.execute(
+            `SELECT 
+          course.NameCourse, 
+          course.NumberOfCredits
+      FROM 
+          attendance 
+      INNER JOIN 
+          course 
+      ON 
+          attendance.IDCourse = course.ID
+      WHERE 
+          attendance.IDStudent = ?
+          AND attendance.AttendanceStatus = '3'
+      GROUP BY 
+          course.NameCourse, 
+          course.NumberOfCredits
+      HAVING 
+          COUNT(attendance.AttendanceStatus) >= ?;
+      `,
+            [IDStudent, SBN]
+          );
+          if (data_di_muon.length > 0) dataWarning.SBN = data_di_muon[0];
+        }
+        if (STC_NO) {
+          const [data_mh_no_tin_chi] = await connection.execute(
+            `
+            SELECT 
+                course.NameCourse, 
+                course.NumberOfCredits
+            FROM 
+                point 
+            INNER JOIN 
+                course 
+            ON 
+                point.IDCourse = course.ID
+            WHERE 
+                point.IDUser = ?
+                AND point.AverageScore < 5
+            GROUP BY 
+                course.NameCourse,
+                course.NumberOfCredits
+            HAVING 
+              sum(course.NumberOfCredits) >= ?
+          `,
+            [IDStudent, STC_NO]
+          );
+          if (data_mh_no_tin_chi.length > 0)
+            dataWarning.STC_NO = data_mh_no_tin_chi[0];
+        }
+        if (GPA) {
+          const [data_gpa] = await connection.execute(
+            `SELECT DISTINCT point.IDUser, sum(point.AverageScore * course.NumberOfCredits)
+             as tc_diem, sum(course.NumberOfCredits) as stc, (sum(point.AverageScore * course.NumberOfCredits) / sum(course.NumberOfCredits))
+              as diem_thang_10 from point INNER JOIN course on point.IDCourse = course.ID  WHERE point.IDUser = ? GROUP BY
+               point.IDUser HAVING (sum(point.AverageScore * course.NumberOfCredits) / sum(course.NumberOfCredits)) < ?;`,
+            [IDStudent, GPA]
+          );
+          if (data_gpa.length > 0) dataWarning.GPA = data_gpa[0];
+        }
+        // viet them nhung dk o day neu co
+        resolve({
+          status: 200,
+          message: "Get warning success",
+          data: dataWarning,
+        });
+      } else {
+        resolve({
+          status: 204,
+          message: "Student not found in warning list",
+        });
+      }
     } catch (err) {
+      console.log(err);
       reject(err);
     }
   });
