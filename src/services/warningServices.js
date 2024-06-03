@@ -1,4 +1,5 @@
 import { pool as connection } from "../config/db.js";
+import nodemailer from "nodemailer";
 export const handleSelectAllWarnings = () =>
   new Promise(async (resolve, reject) => {
     const [result] = await connection.execute("SELECT * FROM warnings");
@@ -146,6 +147,53 @@ function handleDay(dbDateStr) {
   return diffInDays;
 }
 
+const handleSendEmailByUserID = (list_id_student, IDWarning) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      // query msv
+      let list_email = [];
+      for (let i = 0; i < list_id_student.length; i++) {
+        if (!list_id_student[i]) continue;
+        const [student] = await connection.execute(
+          "select user.Email from user where user.ID = ?",
+          [list_id_student[i]]
+        );
+        if (student?.length > 0 && student?.[0]?.Email) {
+          list_email.push(student[0]?.Email);
+        }
+      }
+
+      // join lai theo dinh dang 20210794@eaut.edu.vn,20210795@eaut.edu.vn
+      const list_email_send = list_email.join(",");
+      console.log("XM CHECK list_email_send", list_email_send);
+
+      const [warning] = await connection.execute(
+        "select * from warnings where warnings.ID = ?",
+        [IDWarning]
+      );
+      // handle send_email
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+      const info = await transporter.sendMail({
+        from: '"Cộng tác sinh viên EAUT" <congtacsinhvieneaut.@eaut.edu.vn>', // sender address
+        to: list_email_send || "nguyenxuanmanh2992003@gmail.com", // list of receivers student[0]?.Email
+        subject: warning[0]?.NameWarning, // Subject line
+        text: "Hello world?", // plain text body
+        html: warning[0]?.ContentWarning, // html body
+      });
+      resolve(info);
+    } catch (err) {
+      reject(err);
+    }
+  });
+
 export const handleSendWarning = ({ list_id_warning }) =>
   new Promise(async (resolve, reject) => {
     const condition = [];
@@ -170,10 +218,12 @@ export const handleSendWarning = ({ list_id_warning }) =>
         );
         condition.push(...result);
       }
+      console.log("CHECK CONDITION: ", condition);
       // tim sv trong
       for (let i = 0; i < condition.length; i++) {
         // distructuring
         const { ID, NameWarning, SBN, TTHP, STC_NO, GPA } = condition[i];
+        let ds_email_send = [];
         let list_sv_send_warning = new Set();
         // check sbn
         if (SBN) {
@@ -211,8 +261,8 @@ export const handleSendWarning = ({ list_id_warning }) =>
         for (let value of list_sv_send_warning) {
           if (value && ID) {
             const [check_user_warning] = await connection.execute(
-              "SELECT * from user_warning WHERE user_warning.IDUser = ?",
-              [value]
+              "SELECT * from user_warning WHERE user_warning.IDUser = ? and user_warning.IDWarning = ?",
+              [value, ID]
             );
             if (check_user_warning?.length > 0) {
               // check date
@@ -225,6 +275,7 @@ export const handleSendWarning = ({ list_id_warning }) =>
                   "INSERT INTO user_warning (IDUser, IDWarning) VALUES(?, ?)",
                   [value, ID]
                 );
+                ds_email_send.push(value);
               }
             } else {
               // create
@@ -232,14 +283,17 @@ export const handleSendWarning = ({ list_id_warning }) =>
                 "INSERT INTO user_warning (IDUser, IDWarning) VALUES(?, ?)",
                 [value, ID]
               );
+              ds_email_send.push(value);
             }
           }
         }
-        resolve({
-          OK: "OK",
-        });
+        // send email
+        await handleSendEmailByUserID(ds_email_send, ID);
       }
       await connect.commit();
+      resolve({
+        OK: "OK",
+      });
     } catch (err) {
       await connect.rollback();
       console.log(err);
