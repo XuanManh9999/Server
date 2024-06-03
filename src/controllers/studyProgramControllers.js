@@ -5,7 +5,7 @@ import {
 
 const getAllStudyPrograms = async (_, res) => {
   try {
-    const response = await getAllStudyPrograms();
+    const response = await handleGetAllStudyPrograms();
     return res.status(200).json(response);
   } catch (err) {
     console.log(err);

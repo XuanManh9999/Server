@@ -217,7 +217,6 @@ export const handleSendWarning = ({ list_id_warning }) =>
         );
         condition.push(...result);
       }
-      console.log("CHECK CONDITION: ", condition);
       // tim sv trong
       for (let i = 0; i < condition.length; i++) {
         // distructuring
@@ -268,7 +267,7 @@ export const handleSendWarning = ({ list_id_warning }) =>
               let resultDate = handleDay(
                 check_user_warning[check_user_warning?.length - 1]?.CreateAt
               );
-              if (Number(resultDate) >= 90) {
+              if (Number(resultDate) >= process.env.START_DAY_SEND_EMAIL) {
                 // create
                 await connection.execute(
                   "INSERT INTO user_warning (IDUser, IDWarning) VALUES(?, ?)",
@@ -296,7 +295,6 @@ export const handleSendWarning = ({ list_id_warning }) =>
       });
     } catch (err) {
       await connect.rollback();
-      console.log(err);
       reject(err);
     }
   });
