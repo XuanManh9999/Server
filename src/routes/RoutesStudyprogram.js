@@ -4,7 +4,7 @@ import {
   getAllStudyPrograms,
   importStudyPrograms,
   selectBlockKnowledgeByKeyFaculty,
-  selectCourseByKeyFacultyBlockKnowledge
+  selectCourseByIdBlockknowledge,
 } from "../controllers/index.js";
 
 router.get("/all-studyprograms", getAllStudyPrograms);
@@ -18,7 +18,7 @@ router.get(
 
 router.get(
   "/select-course-by-key-faculty-blockknowledge",
-  selectCourseByKeyFacultyBlockKnowledge
+  selectCourseByIdBlockknowledge
 );
 
 export default router;

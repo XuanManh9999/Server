@@ -426,13 +426,20 @@ const handleSelectBlockKnowledgeByKeyFaculty = (IDFaculty, Key) =>
     }
   });
 
-export const handleSelectCourseByKeyFacultyBlockKnowledge = (
-  IDFaculty,
-  Key,
-  IDBlockknowledge
-) =>
-  new Promise((resolve, reject) => {
+export const handleSelectCourseByIdBlockknowledge = (IDBlockknowledge) =>
+  new Promise(async (resolve, reject) => {
     try {
+      const [result] = await connection.execute(
+        `SELECT * FROM course WHERE IDBlockKnowledge = ?`,
+        [IDBlockknowledge]
+      );
+      resolve({
+        status: 200,
+        message: `Get data all data course done. Is data ${
+          result.length > 0 ? "available" : "empty"
+        }`,
+        data: result,
+      });
     } catch (err) {
       reject(err);
     }

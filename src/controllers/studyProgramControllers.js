@@ -2,7 +2,7 @@ import {
   handleGetAllStudyPrograms,
   handleImportStudyPrograms,
   handleSelectBlockKnowledgeByKeyFaculty,
-  handleSelectCourseByKeyFacultyBlockKnowledge
+  handleSelectCourseByIdBlockknowledge,
 } from "../services/index.js";
 
 const getAllStudyPrograms = async (_, res) => {
@@ -77,19 +77,17 @@ export const selectBlockKnowledgeByKeyFaculty = async (req, res) => {
   }
 };
 
-export const selectCourseByKeyFacultyBlockKnowledge = async (req, res) => {
+export const selectCourseByIdBlockknowledge = async (req, res) => {
   try {
-    const { IDFaculty, Key, IDBlockknowledge } = req.query;
-    if (!IDFaculty && !Key && !IDBlockknowledge) {
+    const { IDBlockknowledge } = req.query;
+    if (!IDBlockknowledge) {
       return res.status(400).json({
         status: 400,
         message:
           "All fields are required with API selectCourseByKeyFacultyBlockKnowledge",
       });
     } else {
-      const response = await handleSelectCourseByKeyFacultyBlockKnowledge(
-        IDFaculty,
-        Key,
+      const response = await handleSelectCourseByIdBlockknowledge(
         IDBlockknowledge
       );
       return res.status(200).json(response);
@@ -97,7 +95,7 @@ export const selectCourseByKeyFacultyBlockKnowledge = async (req, res) => {
   } catch {
     return res.status(500).json({
       status: 500,
-      message: "An Error from selectCourseByKeyFacultyBlockKnowledge",
+      message: "An Error from selectCourseByIdBlockknowledge",
     });
   }
 };
