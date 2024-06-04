@@ -241,7 +241,7 @@ const selectAttendance = (IdFaculty, IdClass, IdCourse, Key, Semester) =>
     try {
       const [result] = await connection.execute(
         `
-      SELECT  user.Msv, user.FullName, user.DateOfBirth, attendance.AttendanceStatus, attendance.Comment 
+      SELECT  user.Msv, user.FullName, user.DateOfBirth, attendance.AttendanceStatus, attendance.Comment, course.NumberOfCredits
       FROM user 
       INNER JOIN userinrole ON userinrole.UserID = user.ID 
       INNER JOIN role ON role.ID = userinrole.RoleID AND role.ID = 3 

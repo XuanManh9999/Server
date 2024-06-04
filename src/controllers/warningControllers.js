@@ -6,6 +6,8 @@ import {
   handleUpdateWarning,
   handleDeleteWarning,
   handleSendWarning,
+  handleSelectAllUserWarning,
+  handleSelectAllUserWarningByID
 } from "../services/index.js";
 
 export const selectAllWarnings = async (req, res) => {
@@ -169,6 +171,38 @@ export const sendWarning = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An error sendAllWarningByID on the server",
+    });
+  }
+};
+
+export const selectAllUserWarning = async (req, res) => {
+  try {
+    const response = await handleSelectAllUserWarning();
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error selectAllUserWarning on the server",
+    });
+  }
+};
+
+export const selectAllUserWarningByID = async (req, res) => {
+  try {
+    const { IDWarning } = req.params;
+    if (IDWarning && IDWarning !== "") {
+      const response = await handleSelectAllUserWarningByID(IDWarning);
+      return res.status(200).json(response);
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: "Please enter complete information to continue",
+      });
+    }
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error selectAllUserWarningByID on the server",
     });
   }
 };
