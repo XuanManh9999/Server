@@ -3,6 +3,8 @@ import {
   handleStudentById,
   handleAllStudent,
   handleWarningStudent,
+  handleSelectProfileStudent,
+  handleUpdateImageProfile,
 } from "../services/index.js";
 
 export const importStudent = async (req, res) => {
@@ -80,6 +82,45 @@ export const WarningStudent = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An error from API WarningStudent",
+    });
+  }
+};
+
+export const selectProfileStudent = async (req, res) => {
+  try {
+    const { IDStudent } = req.params;
+    if (!IDStudent) {
+      return res.status(400).json({
+        status: 400,
+        message: "IDStudent is required from api selectProfileStudent",
+      });
+    }
+    const response = await handleSelectProfileStudent(IDStudent);
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error from API selectProfileStudent",
+    });
+  }
+};
+
+export const updateImageProfile = async (req, res) => {
+  try {
+    const { IDStudent, UrlImage } = req.body;
+    if (!IDStudent && !UrlImage) {
+      return res.status(400).json({
+        status: 400,
+        message:
+          "IDStudent or UrlImage is required from api updateImageProfile",
+      });
+    }
+    const response = await handleUpdateImageProfile(IDStudent, UrlImage);
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error from API updateImageProfile",
     });
   }
 };

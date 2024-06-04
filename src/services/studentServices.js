@@ -373,3 +373,57 @@ export const handleWarningStudent = (IDStudent) =>
       reject(err);
     }
   });
+
+export const handleSelectProfileStudent = (IDStudent) =>
+  new Promise(async (resolve, reject) => {
+    const data_student = {};
+    try {
+      const [result] = await connection.execute(
+        `SELECT DISTINCT user.ID, user.Msv, user.FullName, 
+        user.Gender, user.Email, user.Avatar, user.DateOfBirth, 
+        user.PhoneNumber, user.PermanentResidence, user.Hometown, 
+        user.Key from user INNER JOIN userinrole on user.ID = userinrole.UserID 
+        INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 WHERE user.ID = ? 
+        GROUP BY user.ID`,
+        [IDStudent]
+      );
+      if (result?.length > 0) {
+        data_student.student = result[0];
+        const [data_nt] = await connection.execute(
+          "SELECT * from relatives WHERE relatives.studentId = ?",
+          [IDStudent]
+        );
+        data_student.relatives = data_nt;
+      } else {
+        return res.status(400).json({
+          status: 400,
+          message: "Can't not found user",
+        });
+      }
+      resolve({
+        status: 200,
+        message: "Get profile user done",
+        data: data_student,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export const handleUpdateImageProfile = (IDStudent, UrlImage) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "UPDATE user set user.Avatar = ? WHERE user.ID = ?",
+        [UrlImage, IDStudent]
+      );
+      console.log(result);
+      resolve({
+        status: result?.affectedRows ? 200 : 400,
+        message: result?.affectedRows ? "Update Done" : "Update Error",
+      });
+    } catch (err) {
+      console.log(err);
+      reject(err);
+    }
+  });
