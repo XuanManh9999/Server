@@ -69,7 +69,7 @@ export const studentById = async (req, res) => {
 
 export const WarningStudent = async (req, res) => {
   try {
-    const { IDStudent } = req.params;
+    const IDStudent = req.user;
     if (!IDStudent) {
       return res.status(400).json({
         status: 400,
@@ -88,7 +88,7 @@ export const WarningStudent = async (req, res) => {
 
 export const selectProfileStudent = async (req, res) => {
   try {
-    const { IDStudent } = req.params;
+    const IDStudent = req.user;
     if (!IDStudent) {
       return res.status(400).json({
         status: 400,
@@ -107,7 +107,8 @@ export const selectProfileStudent = async (req, res) => {
 
 export const updateImageProfile = async (req, res) => {
   try {
-    const { IDStudent, UrlImage } = req.body;
+    const IDStudent = req.user;
+    const { UrlImage } = req.body;
     if (!IDStudent && !UrlImage) {
       return res.status(400).json({
         status: 400,

@@ -71,7 +71,8 @@ const authMiddlewareStudent = (req, res, next) => {
         message: "The user is not authenticated, maybe the token has expired ",
       });
     }
-    if (user?.name === "User") {
+    if (user?.role === "User") {
+      req.user = user?.id;
       next();
     } else {
       return res.status(404).json({
