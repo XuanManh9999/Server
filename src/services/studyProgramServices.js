@@ -398,4 +398,48 @@ const handleImportStudyPrograms = (data) =>
     }
   });
 
-export { handleGetAllStudyPrograms, handleImportStudyPrograms };
+const handleSelectBlockKnowledgeByKeyFaculty = (IDFaculty, Key) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "select ID from studyprogram where idFaculty = ? and `Key` = ?",
+        [IDFaculty, Key]
+      );
+      if (result.length === 0) {
+        resolve({
+          status: 200,
+          message: "Không có dữ liệu",
+          data: [],
+        });
+      }
+      const [blockKnowledge] = await connection.execute(
+        "select ID, NameBlockKnowledge from blockknowledge where IDStudyProgram = ?",
+        [result[0]?.ID]
+      );
+      resolve({
+        status: 200,
+        message: "Get data block knowledge by key faculty done",
+        data: blockKnowledge,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export const handleSelectCourseByKeyFacultyBlockKnowledge = (
+  IDFaculty,
+  Key,
+  IDBlockknowledge
+) =>
+  new Promise((resolve, reject) => {
+    try {
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+export {
+  handleGetAllStudyPrograms,
+  handleImportStudyPrograms,
+  handleSelectBlockKnowledgeByKeyFaculty,
+};
