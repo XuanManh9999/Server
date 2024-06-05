@@ -4,6 +4,7 @@ const importPoint = async (req, res) => {
   try {
     const {
       Course,
+      Semester,
       Class,
       Teacher,
       Faculty,
@@ -15,6 +16,7 @@ const importPoint = async (req, res) => {
     } = req.body;
     if (
       Course &&
+      Semester &&
       Teacher &&
       Faculty &&
       TotalHours &&

@@ -8,6 +8,7 @@ const tinhKhoa = (msv) => {
 const importPoint = ({
   Course,
   Teacher,
+  Semester,
   Faculty,
   TotalHours,
   NumberOfCredits,
@@ -200,7 +201,7 @@ const importPoint = ({
           );
           if (checkPoint?.length > 0) {
             await connect.execute(
-              "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ? where IDUser = ? and IDCourse = ?",
+              "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ?, Semester = ?, where IDUser = ? and IDCourse = ?",
               [
                 +DataPoint[i]?.Frequent?.toFixed(2) || -1,
                 +DataPoint[i]?.MidtermScore?.toFixed(2) || -1,
@@ -209,6 +210,7 @@ const importPoint = ({
                 DataPoint[i]?.Scores?.toFixed(2) || -1,
                 DataPoint[i]?.LetterGrades,
                 DataPoint[i]?.Note,
+                Semester,
                 idStudent,
                 idCourse,
               ]
@@ -216,7 +218,7 @@ const importPoint = ({
           } else {
             if (DataPoint[i]) {
               await connect.execute(
-                "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "insert into point (Frequent, MidtermScore, FinalExamScore, AverageScore, Scores, LetterGrades, Note, Semester, IDUser, IDCourse) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [
                   +DataPoint[i]?.Frequent?.toFixed(2) || -1,
                   +DataPoint[i]?.MidtermScore?.toFixed(2) || -1,
@@ -225,6 +227,7 @@ const importPoint = ({
                   DataPoint[i]?.Scores?.toFixed(2) || -1,
                   DataPoint[i]?.LetterGrades,
                   DataPoint[i]?.Note,
+                  Semester,
                   idStudent,
                   idCourse,
                 ]
