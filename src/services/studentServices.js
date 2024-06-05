@@ -296,7 +296,7 @@ export const handleWarningStudent = (IDStudent) =>
         // find data cua user do
         dataWarning.NameWarning = NameWarning;
         dataWarning.LevelWarning = LevelWarning;
-        dataWarning.TTHP = "Chưa có thông tin";
+        dataWarning.TTHP = TTHP;
         if (SBN) {
           const [data_di_muon] = await connection.execute(
             `SELECT 
@@ -334,7 +334,7 @@ export const handleWarningStudent = (IDStudent) =>
                 point.IDCourse = course.ID
             WHERE 
                 point.IDUser = ?
-                AND point.AverageScore < 5
+                AND point.AverageScore < 4
             GROUP BY 
                 course.NameCourse
             HAVING 
