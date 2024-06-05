@@ -1,5 +1,7 @@
 import { pool as connection } from "../config/db.js";
 import nodemailer from "nodemailer";
+import { handleWarningStudent } from "./studentServices.js";
+
 export const handleSelectAllWarnings = () =>
   new Promise(async (resolve, reject) => {
     const [result] = await connection.execute("SELECT * FROM warnings");
@@ -301,17 +303,27 @@ export const handleSendWarning = ({ list_id_warning }) =>
 
 export const handleSelectAllUserWarning = () =>
   new Promise(async (resolve, reject) => {
+    const formatData = [];
     try {
       const [result] = await connection.execute(
-        "SELECT user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID;"
+        "SELECT user.ID, user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID;"
       );
+      for (let i = 0; i < result.length; i++) {
+        if (result[i]?.ID) {
+          const response = await handleWarningStudent(result[i]?.ID);
+          formatData.push({
+            ...result[i],
+            ...response.data,
+          });
+        }
+      }
       resolve({
-        status: result.length === 0 ? 404 : 200,
+        status: formatData.length === 0 ? 404 : 200,
         message:
-          result.length === 0
+        formatData.length === 0
             ? "User warning not found"
             : "Get user warning successfully",
-        data: result,
+        data: formatData,
       });
     } catch (err) {
       reject(err);
@@ -322,7 +334,7 @@ export const handleSelectAllUserWarningByID = (IDWarning) =>
   new Promise(async (resolve, reject) => {
     try {
       const [result] = await connection.execute(
-        "SELECT user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID and warnings.ID = ?;",
+        "SELECT  user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID and warnings.ID = ?;",
         [IDWarning]
       );
       resolve({

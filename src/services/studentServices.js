@@ -312,14 +312,13 @@ export const handleWarningStudent = (IDStudent) =>
           attendance.IDStudent = ?
           AND attendance.AttendanceStatus = '3'
       GROUP BY 
-          course.NameCourse, 
-          course.NumberOfCredits
+          course.NameCourse
       HAVING 
           COUNT(attendance.AttendanceStatus) >= ?;
       `,
             [IDStudent, SBN]
           );
-          if (data_di_muon.length > 0) dataWarning.SBN = data_di_muon[0];
+          if (data_di_muon.length > 0) dataWarning.SBN = data_di_muon;
         }
         if (STC_NO) {
           const [data_mh_no_tin_chi] = await connection.execute(
@@ -337,15 +336,15 @@ export const handleWarningStudent = (IDStudent) =>
                 point.IDUser = ?
                 AND point.AverageScore < 5
             GROUP BY 
-                course.NameCourse,
-                course.NumberOfCredits
+                course.NameCourse
             HAVING 
               sum(course.NumberOfCredits) >= ?
           `,
             [IDStudent, STC_NO]
           );
-          if (data_mh_no_tin_chi.length > 0)
-            dataWarning.STC_NO = data_mh_no_tin_chi[0];
+          if (data_mh_no_tin_chi.length > 0) {
+            dataWarning.STC_NO = data_mh_no_tin_chi;
+          }
         }
         if (GPA) {
           const [data_gpa] = await connection.execute(
@@ -418,7 +417,6 @@ export const handleUpdateImageProfile = (IDStudent, UrlImage) =>
         "UPDATE user set user.Avatar = ? WHERE user.ID = ?",
         [UrlImage, IDStudent]
       );
-      console.log(result);
       resolve({
         status: result?.affectedRows ? 200 : 400,
         message: result?.affectedRows ? "Update Done" : "Update Error",
