@@ -8,3 +8,4 @@ export * from "./commonControllor.js";
 export * from "./facultyControllers.js";
 export * from "./classControllers.js";
 export * from "./warningControllers.js";
+export * from "./reportControllers.js";

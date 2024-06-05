@@ -6,10 +6,14 @@ import {
   selectClassByFacultyAndKey,
   selectSemesterByKey,
   selectCourseByFacultyAndSemester,
+  SelectAllFaculty
 } from "../controllers/index.js";
 const router = express.Router();
 // Lấy khoa theo khóa
 router.get("/select-all-faculty", selectFaculty);
+
+// select-all-faculty
+router.get("/all-faculty", SelectAllFaculty);
 
 // Lấy tất cả khóa của sinh viên có trong hệ thống
 router.get("/select-years-by-faculty", selectYearsStudent);
@@ -27,4 +31,3 @@ router.get(
 );
 
 export default router;
- 

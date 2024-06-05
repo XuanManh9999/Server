@@ -132,8 +132,8 @@ const importPoint = ({
           let idStudent;
           // check user xem đã có student đó chưa?
           const [checkStudent] = await connect.execute(
-            "SELECT DISTINCT user.ID, user.FullName from user INNER JOIN userinrole on user.ID = userinrole.UserID INNER JOIN role on role.ID = userinrole.RoleID and role.id = 3 and user.FullName = ? and user.Msv = ?",
-            [DataStudents[i]?.FullName, DataStudents[i]?.Msv]
+            "SELECT user.ID from user WHERE user.Msv = ?",
+            [DataStudents[i]?.Msv]
           );
 
           idStudent = checkStudent.length > 0 ? checkStudent[0].ID : null; // Update index here
@@ -144,7 +144,7 @@ const importPoint = ({
               salt
             );
             let [result] = await connect.execute(
-              "insert into user (Msv, FullName, Gender, Email, Key, Password, status, IDClass) values (?, ?, ?, ?, ?, ?, ?, ?)",
+              "insert into user (Msv, FullName, Gender, Email, `Key`, Password, status, IDClass) values (?, ?, ?, ?, ?, ?, ?, ?)",
               [
                 DataStudents[i]?.Msv,
                 DataStudents[i]?.FullName,

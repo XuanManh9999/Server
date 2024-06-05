@@ -182,3 +182,19 @@ export const handleSelectCourseByFacultyAndSemester = (
       reject(err);
     }
   });
+
+export const handleCommonSelectAllFaculty = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const [result] = await connection.execute(
+        "SELECT ID, FacultyName FROM faculty"
+      );
+      resolve({
+        status: result?.length > 0 ? 200 : 400,
+        message: result?.length > 0 ? "Success" : "Not Found",
+        data: result,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });

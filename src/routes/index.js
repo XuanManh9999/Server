@@ -8,6 +8,7 @@ import routerFaculty from "./RoutesFaculty.js";
 import routerClass from "./RoutesClass.js";
 import routerStudent from "./RoutesStudent.js";
 import routerWarning from "./RoutesWarning.js";
+import routerReport from "./RoutesReport.js";
 
 function app(express) {
   express.use("/api/v1/user", routerUser);
@@ -20,5 +21,6 @@ function app(express) {
   express.use("/api/v1/class", routerClass);
   express.use("/api/v1/student", routerStudent);
   express.use("/api/v1/warning", routerWarning);
+  express.use("/api/v1/report", routerReport);
 }
 export default app;

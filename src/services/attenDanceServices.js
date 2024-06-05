@@ -220,6 +220,17 @@ const importAttendance = ({
                 [idStudent, idCourse]
               );
             }
+            // check xem sinh vien da hoc khoa do chua
+            const [checkUser_faculty] = await connect.execute(
+              "SELECT * FROM user_faculty WHERE IDUser = ? AND IDFaculty = ?",
+              [idStudent, idFaculty]
+            );
+            if (checkUser_faculty.length === 0) {
+              await connect.execute(
+                "insert into user_faculty (IDUser, IDFaculty) values (?, ?)",
+                [idStudent, idFaculty]
+              );
+            }
           }
 
           // them diem danh

@@ -4,6 +4,7 @@ import {
   handleSelectClassByFacultyAndKey,
   handleSelectSemesterByKey,
   handleSelectCourseByFacultyAndSemester,
+  handleCommonSelectAllFaculty
 } from "../services/index.js";
 
 export const selectYearsStudent = async (req, res) => {
@@ -98,6 +99,18 @@ export const selectCourseByFacultyAndSemester = async (req, res) => {
     return res.status(500).json({
       status: 500,
       message: "An error from server with API selectCourseByFacultyAndSemester",
+    });
+  }
+};
+
+export const SelectAllFaculty = async (req, res) => {
+  try {
+    const response = await handleCommonSelectAllFaculty();
+    return res.status(200).json(response);
+  } catch {
+    return res.status(500).json({
+      status: 500,
+      message: "An error from server with API SelectAllFaculty",
     });
   }
 };
