@@ -25,8 +25,9 @@ export const followReportClass = async (req, res) => {
   try {
     const { Key, IDFaculty, IDClass, Semester } = req.query;
     // validate
-    if (!Key || !IDFaculty || !IDClass || !Semester) {
+    if (!Key || !IDFaculty || !IDClass || !Number(Semester)) {
       return res.status(400).json({
+        status: "400",
         message: "Missing required fields",
       });
     }
