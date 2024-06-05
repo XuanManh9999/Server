@@ -1,5 +1,9 @@
 import _ from "lodash";
 import { pool as connection } from "../config/db.js";
+import bcrypt from "bcrypt";
+const tinhKhoa = (msv) => {
+  return Number(msv.slice(0, 4)) - process.env.START_YEAR - 1;
+};
 
 const importPoint = ({
   Course,
@@ -134,12 +138,22 @@ const importPoint = ({
 
           idStudent = checkStudent.length > 0 ? checkStudent[0].ID : null; // Update index here
           if (idStudent === null) {
+            const salt = +process.env.SALT;
+            const hashPassword = bcrypt.hashSync(
+              process.env.DEFAULT_FASSWORD,
+              salt
+            );
             let [result] = await connect.execute(
-              "insert into user (Msv, FullName, Gender, IDClass) values (?, ?, ?, ?)",
+              "insert into user (Msv, FullName, Gender, Email, Key, Password, status, IDClass) values (?, ?, ?, ?, ?, ?, ?, ?)",
               [
                 DataStudents[i]?.Msv,
                 DataStudents[i]?.FullName,
                 DataStudents[i]?.Gender,
+                DataStudents[i]?.Msv &&
+                  DataStudents[i]?.Msv + process.env.DOMAIN_DEFAULT_EMAIL,
+                DataStudents[i]?.Msv && tinhKhoa(DataStudents[i]?.Msv),
+                DataStudents[i]?.Msv && hashPassword,
+                "active",
                 idClass,
               ]
             );

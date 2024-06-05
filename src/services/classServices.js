@@ -34,6 +34,7 @@ export const heandleCreateClass = ({ NameClass, IDFaculty }) =>
       reject(err);
     }
   });
+
 export const heandleUpdateClass = ({ IDClass, NameClass, IDFaculty }) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -56,6 +57,7 @@ export const heandleUpdateClass = ({ IDClass, NameClass, IDFaculty }) =>
       reject(err);
     }
   });
+
 export const heandleDeleteClass = ({ IDClass }) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -78,6 +80,7 @@ export const heandleDeleteClass = ({ IDClass }) =>
       reject(err);
     }
   });
+
 export const heandleSelectClassByIdFaculty = ({ IDFaculty }) =>
   new Promise(async (resolve, reject) => {
     try {

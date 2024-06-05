@@ -1,9 +1,7 @@
 import { pool as connection } from "../config/db.js";
 import bcrypt from "bcrypt";
 const tinhKhoa = (msv) => {
-  const date = new Date();
-  const getYear = date.getFullYear();
-  return getYear - Number(msv.slice(0, 4));
+  return Number(msv.slice(0, 4)) - process.env.START_YEAR - 1;
 };
 
 export const handleImportStudent = (data) =>
@@ -76,7 +74,10 @@ export const handleImportStudent = (data) =>
             // neu co thi update, khong thi insert
             const key = tinhKhoa(Msv);
             const salt = +process.env.SALT;
-            const hashPassword = bcrypt.hashSync("123456@aA", salt);
+            const hashPassword = bcrypt.hashSync(
+              process.env.DEFAULT_FASSWORD,
+              salt
+            );
             if (student.length === 0) {
               const [result] = await connect.execute(
                 `INSERT INTO user (Msv, FullName, UserName, Password, 
@@ -106,8 +107,8 @@ export const handleImportStudent = (data) =>
                 [
                   Msv,
                   HoTen,
-                  `${Msv}@eaut.edu.vn`,
-                  hashPassword,
+                  Msv && `${Msv}${process.env.DOMAIN_DEFAULT_EMAIL}`,
+                  Msv && hashPassword,
                   GioiTinh,
                   DanToc,
                   NgaySinh,

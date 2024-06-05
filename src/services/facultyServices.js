@@ -1,5 +1,4 @@
 import { pool as connection } from "../config/db.js";
-
 export const handleAddFaculty = (data) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -39,7 +38,6 @@ export const handleUpdateFaculty = async (data) => {
     };
   }
 };
-
 export const handleDeleteFaculty = async (idFaculty) => {
   try {
     const [result] = await connection.execute(
@@ -113,7 +111,6 @@ export const handleImportFaculty = (listFaculty) =>
       reject(err);
     }
   });
-
 export const handleSelectAllFaculty = () =>
   new Promise(async (resolve, reject) => {
     try {
@@ -129,7 +126,6 @@ export const handleSelectAllFaculty = () =>
       reject(err);
     }
   });
-
 export const handleCountFaculty = () =>
   new Promise(async (resolve, reject) => {
     try {

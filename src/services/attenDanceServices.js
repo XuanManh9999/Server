@@ -1,4 +1,5 @@
 import { pool as connection } from "../config/db.js";
+import bcrypt from "bcrypt";
 
 const classByIdFaculty = (id) => {
   return new Promise(async (resolve, reject) => {
@@ -49,6 +50,9 @@ const courseByIdClass = (id) => {
       reject(err);
     }
   });
+};
+const tinhKhoa = (msv) => {
+  return Number(msv.slice(0, 4)) - process.env.START_YEAR - 1;
 };
 
 const importAttendance = ({
@@ -136,10 +140,24 @@ const importAttendance = ({
           );
           idStudent = student.length > 0 ? student[0].ID : null;
           if (idStudent === null) {
+            const salt = +process.env.SALT;
+            const hashPassword = bcrypt.hashSync(
+              process.env.DEFAULT_FASSWORD,
+              salt
+            );
             // them student
             const [result] = await connect.execute(
-              "insert into user (Msv, FullName, DateOfBirth, IDClass) values (?, ?, ?, ?)",
-              [Msv, FullName, DateOfBirth, idClass]
+              "insert into user (Msv, FullName, DateOfBirth, Email, Password, `Key`, IDClass, status) values (?, ?, ?, ?, ?, ?, ?, ?)",
+              [
+                Msv,
+                FullName,
+                DateOfBirth,
+                Msv && `${Msv + process.env.DOMAIN_DEFAULT_EMAIL}`,
+                hashPassword,
+                Msv && tinhKhoa(Msv),
+                idClass,
+                "active",
+              ]
             );
             idStudent = result.insertId;
 
@@ -154,7 +172,31 @@ const importAttendance = ({
               "insert into user_course (IDUser, IDCourse) values (?, ?)",
               [idStudent, idCourse]
             );
+            // them user_faculty
+            await connect.execute(
+              "insert into user_faculty (IDUser, IDFaculty) values (?, ?)",
+              [idStudent, idFaculty]
+            );
           } else {
+            const salt = +process.env.SALT;
+            const hashPassword = bcrypt.hashSync(
+              process.env.DEFAULT_FASSWORD,
+              salt
+            );
+            // update thông tin sinh viên
+            await connect.execute(
+              "update user set FullName = ?, DateOfBirth = ?, Email = ?, Password = ?, `Key` = ?, status = ? where ID = ?",
+              [
+                FullName,
+                DateOfBirth,
+                Msv && `${Msv + process.env.DOMAIN_DEFAULT_EMAIL}`,
+                hashPassword,
+                Msv && tinhKhoa(Msv),
+                "active",
+                idStudent,
+              ]
+            );
+
             // check quyen
             const [checkRole] = await connect.execute(
               "SELECT * FROM userinrole WHERE UserID = ? AND RoleID = 3",
@@ -212,7 +254,7 @@ const importAttendance = ({
                     AttendanceStatus,
                     idStudent,
                     Day,
-                    Comment,
+                    Comment || "",
                     idCourse,
                   ]
                 );
@@ -286,4 +328,3 @@ export {
   selectAttendance,
 };
 // lấy ra sinh viên
-// Lấy ra thông tin điểm danh và cho vào một mảng
