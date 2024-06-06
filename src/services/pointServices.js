@@ -201,7 +201,7 @@ const importPoint = ({
           );
           if (checkPoint?.length > 0) {
             await connect.execute(
-              "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ?, Semester = ?, where IDUser = ? and IDCourse = ?",
+              "update point set Frequent = ?, MidtermScore = ?, FinalExamScore = ?, AverageScore = ?, Scores = ?, LetterGrades = ?, Note = ?, Semester = ? where IDUser = ? and IDCourse = ?",
               [
                 +DataPoint[i]?.Frequent?.toFixed(2) || -1,
                 +DataPoint[i]?.MidtermScore?.toFixed(2) || -1,
