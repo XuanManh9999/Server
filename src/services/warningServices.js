@@ -306,7 +306,7 @@ export const handleSelectAllUserWarning = () =>
     const formatData = [];
     try {
       const [result] = await connection.execute(
-        "SELECT user.ID, user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID;"
+        "SELECT user.ID, user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, user.status, user.Key, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID;"
       );
       for (let i = 0; i < result.length; i++) {
         if (result[i]?.ID) {
@@ -335,7 +335,7 @@ export const handleSelectAllUserWarningByID = (IDWarning) =>
     const formatData = [];
     try {
       const [result] = await connection.execute(
-        "SELECT user.ID, user.Msv, user.FullName, user.Gender, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID and warnings.ID = ?;",
+        "SELECT user.ID, user.Msv, user.FullName, user.Gender, user.status, user.Key, user.DateOfBirth, user.Email, user.PhoneNumber, warnings.NameWarning, warnings.LevelWarning, user_warning.CreateAt from user INNER JOIN userinrole on userinrole.UserID = user.ID INNER JOIN role on role.ID = userinrole.RoleID and role.ID = 3 INNER JOIN user_warning on user_warning.IDUser = user.ID INNER JOIN warnings on user_warning.IDWarning = warnings.ID and warnings.ID = ?;",
         [IDWarning]
       );
       for (let i = 0; i < result.length; i++) {

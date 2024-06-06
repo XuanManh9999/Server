@@ -25,6 +25,9 @@ router.get("/select-class-by-faculty-and-key", selectClassByFacultyAndKey);
 router.get("/select-semester-by-key", selectSemesterByKey);
 
 // Lấy các môn học theo khoa, khoa, ky
+
+
+
 router.get(
   "/select-courses-by-faculty-and-semester-and-key",
   selectCourseByFacultyAndSemester
