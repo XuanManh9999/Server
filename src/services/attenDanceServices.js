@@ -52,7 +52,7 @@ const courseByIdClass = (id) => {
   });
 };
 const tinhKhoa = (msv) => {
-  return Number(msv + ""?.slice(0, 4)) - process.env.START_YEAR - 1;
+  return String(msv).slice(0, 4) - +process.env.START_YEAR - 1;
 };
 
 const importAttendance = ({
