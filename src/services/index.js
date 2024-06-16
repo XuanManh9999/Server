@@ -9,3 +9,4 @@ export * from "./facultyServices.js";
 export * from "./classServices.js";
 export * from "./warningServices.js";
 export * from "./reportServices.js";
+export * from "./studentServices.js";
