@@ -4,7 +4,7 @@ import {
   handleSelectClassByFacultyAndKey,
   handleSelectSemesterByKey,
   handleSelectCourseByFacultyAndSemester,
-  handleCommonSelectAllFaculty
+  handleCommonSelectAllFaculty,
 } from "../services/index.js";
 
 export const selectYearsStudent = async (req, res) => {
